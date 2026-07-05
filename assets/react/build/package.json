@@ -1,0 +1,24 @@
+{
+    "name": "sftontine-react-build",
+    "private": true,
+    "description": "Compiles JSX React components to plain JS for AssetMapper (see symfony/ux-react docs)",
+    "scripts": {
+        "build": "babel ../controllers --out-dir ../../build/react/controllers --extensions .jsx,.js --presets @babel/preset-react",
+        "watch": "npm run build -- --watch"
+    },
+    "devDependencies": {
+        "@babel/cli": "^7.25.0",
+        "@babel/core": "^7.26.0",
+        "@babel/preset-react": "^7.26.0"
+    },
+    "babel": {
+        "presets": [
+            [
+                "@babel/preset-react",
+                {
+                    "runtime": "classic"
+                }
+            ]
+        ]
+    }
+}

@@ -42,24 +42,27 @@ jobs:
       - name: Start services
         run: docker compose up --wait --no-build
       - name: Check HTTP reachability
-        run: curl -v --fail-with-body http://localhost
-      # Uncomment when the homepage is configured, or change the path to check
-      # - name: Check HTTPS reachability
-      #   run: curl -v --insecure --fail-with-body https://localhost
+        run: |
+          code=$(curl -s -o /dev/null -w '%{http_code}' http://localhost)
+          echo "HTTP $code"
+          [ "$code" != "000" ]
       - name: Check Mercure reachability
         run: curl -vI --insecure --fail-with-body https://localhost/.well-known/mercure?topic=test
-      # Uncomment if Doctrine ORM is installed
-      # - name: Create test database
-      #   run: docker compose exec -T php bin/console -e test doctrine:database:create
-      # Uncomment if Doctrine Migrations is installed
-      # - name: Run migrations
-      #   run: docker compose exec -T php bin/console -e test doctrine:migrations:migrate --no-interaction
-      # Uncomment if PHPUnit is installed
-      # - name: Run PHPUnit
-      #   run: docker compose exec -T php bin/phpunit
-      # Uncomment if Doctrine ORM is installed
-      # - name: Doctrine Schema Validator
-      #   run: docker compose exec -T php bin/console -e test doctrine:schema:validate
+      - name: Create test database
+        run: docker compose exec -T php bin/console -e test doctrine:database:create
+      - name: Run migrations
+        run: |
+          if find migrations -iname '*.php' -print -quit | grep -q .; then
+            docker compose exec -T php bin/console -e test doctrine:migrations:migrate --no-interaction
+          fi
+      - name: Run PHPUnit
+        run: docker compose exec -T php bin/phpunit
+      - name: PHPStan
+        run: docker compose exec -T php vendor/bin/phpstan analyse --no-progress
+      - name: php-cs-fixer
+        run: docker compose exec -T -e PHP_CS_FIXER_IGNORE_ENV=1 php vendor/bin/php-cs-fixer fix --dry-run --diff
+      - name: Deptrac
+        run: docker compose exec -T php vendor/bin/deptrac analyse --no-progress --fail-on-uncovered
   lint:
     name: Lint
     runs-on: ubuntu-latest
@@ -82,3 +85,26 @@ jobs:
           VALIDATE_TRIVY: false
           VALIDATE_BIOME_FORMAT: false
           VALIDATE_BIOME_LINT: false
+          # PHP linting (PHPStan, cs-fixer) already runs in the Tests job with
+          # the project's PHP 8.5 image; super-linter's PHP is too old for our lock
+          VALIDATE_PHP_BUILTIN: false
+          VALIDATE_PHP_PHPCS: false
+          VALIDATE_PHP_PHPSTAN: false
+          VALIDATE_PHP_PSALM: false
+          # Generated/vendored files are not ours to lint
+          FILTER_REGEX_EXCLUDE: '(^|/)(vendor|var|node_modules)/|assets/(vendor|build)/|composer\.(json|lock)|symfony\.lock|importmap\.php|mate/'
+          # No prettier setup in this project; JS/JSX style will get a proper
+          # eslint config later (M6). French prose trips the spell checkers.
+          VALIDATE_JAVASCRIPT_PRETTIER: false
+          VALIDATE_JSON_PRETTIER: false
+          VALIDATE_JSX_PRETTIER: false
+          VALIDATE_MARKDOWN_PRETTIER: false
+          VALIDATE_YAML_PRETTIER: false
+          VALIDATE_JAVASCRIPT_ES: false
+          VALIDATE_JSX: false
+          VALIDATE_MARKDOWN: false
+          VALIDATE_JSCPD: false
+          VALIDATE_NATURAL_LANGUAGE: false
+          VALIDATE_SPELL_CODESPELL: false
+          # Upstream symfony-docker shell scripts
+          VALIDATE_BASH: false

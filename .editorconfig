@@ -9,14 +9,19 @@ charset = utf-8
 insert_final_newline = true
 end_of_line = lf
 indent_style = space
+indent_size = 2
+
+# PHP follows PSR-12 (4 spaces), enforced by php-cs-fixer
+[*.php]
 indent_size = 4
 
 [**/{Dockerfile,Caddyfile,*.sh}]
 indent_style = tab
 
-[{compose.*yaml,.devcontainer/compose.*yaml,.github/**/*.yaml}]
-indent_size = 2
-
 [**.md]
 indent_size = unset
 indent_style = unset
+
+# Symfony recipe XML files align attributes, not a fixed padding grid
+[*.xml]
+indent_size = unset

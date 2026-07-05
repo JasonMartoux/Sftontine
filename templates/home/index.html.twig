@@ -1,0 +1,22 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Sftontine{% endblock %}
+
+{% block body %}
+    <main style="max-width: 40rem; margin: 4rem auto; font-family: system-ui, sans-serif;">
+        <h1>Sftontine</h1>
+        <p>Épargne collective en USDC, yield streamé en temps réel via SuperVault.</p>
+
+        <h2>Démo du socle UX</h2>
+
+        {# Îlot React (le futur widget Privy sera monté de la même façon) #}
+        <section>
+            <div {{ react_component('Hello', { fullName: 'Sftontine' }) }}></div>
+        </section>
+
+        {# Live Component avec polling (le futur dashboard de position) #}
+        <section>
+            {{ component('ServerTime') }}
+        </section>
+    </main>
+{% endblock %}

@@ -1,0 +1,5 @@
+react:
+    # JSX sources live in assets/react/controllers and are compiled to plain JS
+    # by Babel (assets/react/build) as required by ux-react with AssetMapper:
+    # https://symfony.com/bundles/ux-react/current/index.html
+    controllers_path: '%kernel.project_dir%/assets/build/react/controllers'

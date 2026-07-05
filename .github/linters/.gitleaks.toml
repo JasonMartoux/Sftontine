@@ -1,0 +1,9 @@
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Symfony dev/test-only secrets committed by the framework recipes"
+paths = [
+    '''\.env\.dev$''',
+    '''\.env\.test$''',
+]
