@@ -91,3 +91,20 @@ jobs:
           VALIDATE_PHP_PHPCS: false
           VALIDATE_PHP_PHPSTAN: false
           VALIDATE_PHP_PSALM: false
+          # Generated/vendored files are not ours to lint
+          FILTER_REGEX_EXCLUDE: '(^|/)(vendor|var|node_modules)/|assets/(vendor|build)/|composer\.(json|lock)|symfony\.lock|importmap\.php|mate/'
+          # No prettier setup in this project; JS/JSX style will get a proper
+          # eslint config later (M6). French prose trips the spell checkers.
+          VALIDATE_JAVASCRIPT_PRETTIER: false
+          VALIDATE_JSON_PRETTIER: false
+          VALIDATE_JSX_PRETTIER: false
+          VALIDATE_MARKDOWN_PRETTIER: false
+          VALIDATE_YAML_PRETTIER: false
+          VALIDATE_JAVASCRIPT_ES: false
+          VALIDATE_JSX: false
+          VALIDATE_MARKDOWN: false
+          VALIDATE_JSCPD: false
+          VALIDATE_NATURAL_LANGUAGE: false
+          VALIDATE_SPELL_CODESPELL: false
+          # Upstream symfony-docker shell scripts
+          VALIDATE_BASH: false
