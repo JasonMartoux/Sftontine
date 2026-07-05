@@ -1,67 +1,85 @@
 deptrac:
-  paths:
-    - ./src
+    paths:
+        - ./src
 
-  layers:
-    - name: Domain
-      collectors:
-        - type: directory
-          value: src/Domain/.*
-    - name: Application
-      collectors:
-        - type: directory
-          value: src/Application/.*
-    - name: Infrastructure
-      collectors:
-        - type: directory
-          value: src/Infrastructure/.*
-    - name: Presentation
-      collectors:
-        - type: directory
-          value: src/Presentation/.*
-    # Vendor layers: make framework dependencies explicit so the inner
-    # circles (Domain, Application) provably stay framework-free.
-    - name: Money
-      collectors:
-        - type: classNameRegex
-          value: /^Money\\/
-    - name: Psr
-      collectors:
-        - type: classNameRegex
-          value: /^Psr\\/
-    - name: Symfony
-      collectors:
-        - type: classNameRegex
-          value: /^Symfony\\/
-    - name: Doctrine
-      collectors:
-        - type: classNameRegex
-          value: /^Doctrine\\/
-    - name: VendorMisc
-      collectors:
-        - type: classNameRegex
-          value: /^(Firebase|kornrunner|Twig|Monolog|BcMath)\\/
+    layers:
+        -
+            name: Domain
+            collectors:
+                -
+                    type: directory
+                    value: src/Domain/.*
+        -
+            name: Application
+            collectors:
+                -
+                    type: directory
+                    value: src/Application/.*
+        -
+            name: Infrastructure
+            collectors:
+                -
+                    type: directory
+                    value: src/Infrastructure/.*
+        -
+            name: Presentation
+            collectors:
+                -
+                    type: directory
+                    value: src/Presentation/.*
+        # Vendor layers: make framework dependencies explicit so the inner
+        # circles (Domain, Application) provably stay framework-free.
+        -
+            name: Money
+            collectors:
+                -
+                    type: classNameRegex
+                    value: /^Money\\/
+        -
+            name: Psr
+            collectors:
+                -
+                    type: classNameRegex
+                    value: /^Psr\\/
+        -
+            name: Symfony
+            collectors:
+                -
+                    type: classNameRegex
+                    value: /^Symfony\\/
+        -
+            name: Doctrine
+            collectors:
+                -
+                    type: classNameRegex
+                    value: /^Doctrine\\/
+        -
+            name: VendorMisc
+            collectors:
+                -
+                    type: classNameRegex
+                    value: /^(Firebase|kornrunner|Twig|Monolog|BcMath)\\/
 
-  ruleset:
-    # Dependency arrow always points inward
-    Domain:
-      - Money           # pure value-object library, allowed in the domain
-    Application:
-      - Domain
-      - Money
-      - Psr             # PSR interfaces only (clock, logger), never implementations
-    Infrastructure:
-      - Application
-      - Domain
-      - Money
-      - Psr
-      - Symfony
-      - Doctrine
-      - VendorMisc
-    Presentation:
-      - Application
-      - Domain
-      - Money
-      - Psr
-      - Symfony
-      - VendorMisc
+    ruleset:
+        # Dependency arrow always points inward
+        Domain:
+            - Money # pure value-object library, allowed in the domain
+        Application:
+            - Domain
+            - Money
+            - Psr # PSR interfaces only (clock, logger), never implementations
+        Infrastructure:
+            - Application
+            - Domain
+            - Money
+            - Psr
+            - Symfony
+            - Doctrine
+            - VendorMisc
+        Presentation:
+            - Application
+            - Domain
+            - Money
+            - Psr
+            - Symfony
+            - VendorMisc
