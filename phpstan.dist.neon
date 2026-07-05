@@ -6,8 +6,10 @@ parameters:
     treatPhpDocTypesAsCertain: false
     ignoreErrors:
         # Skeleton code: Kernel::getAllowedEnvs() is called by the Symfony runtime
-        - identifier: method.unused
-          path: src/Kernel.php
+        -
+            identifier: method.unused
+            path: src/Kernel.php
         # Skeleton code: defensive method_exists() check shipped by symfony/test-pack
-        - identifier: function.alreadyNarrowedType
-          path: tests/bootstrap.php
+        -
+            identifier: function.alreadyNarrowedType
+            path: tests/bootstrap.php
