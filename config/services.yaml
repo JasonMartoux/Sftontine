@@ -16,8 +16,17 @@ services:
 
     # makes classes in src/ available to be used as services
     # this creates a service per class whose id is the fully-qualified class name
+    # Domain is excluded: pure business classes are never services (clean architecture)
     App\:
         resource: '../src/'
+        exclude:
+            - '../src/Domain/'
+            - '../src/Kernel.php'
+
+    App\Presentation\Http\:
+        resource: '../src/Presentation/Http/'
+        tags: ['controller.service_arguments']
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
+    # Composition root: bind Application ports to Infrastructure adapters here

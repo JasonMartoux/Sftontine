@@ -9,11 +9,17 @@
         "php": ">=8.5.7",
         "ext-ctype": "*",
         "ext-iconv": "*",
+        "doctrine/doctrine-bundle": "^3.2",
+        "doctrine/doctrine-migrations-bundle": "^4.0",
+        "doctrine/orm": "^3.6",
         "symfony/console": "8.1.*",
         "symfony/dotenv": "8.1.*",
         "symfony/flex": "^2",
         "symfony/framework-bundle": "8.1.*",
+        "symfony/http-client": "8.1.*",
+        "symfony/messenger": "8.1.*",
         "symfony/runtime": "8.1.*",
+        "symfony/scheduler": "8.1.*",
         "symfony/yaml": "8.1.*"
     },
     "config": {
@@ -68,5 +74,8 @@
             "require": "8.1.*",
             "docker": true
         }
+    },
+    "require-dev": {
+        "deptrac/deptrac": "^4.6"
     }
 }
