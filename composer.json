@@ -12,6 +12,8 @@
         "doctrine/doctrine-bundle": "^3.2",
         "doctrine/doctrine-migrations-bundle": "^4.0",
         "doctrine/orm": "^3.6",
+        "symfony/asset": "8.1.*",
+        "symfony/asset-mapper": "8.1.*",
         "symfony/console": "8.1.*",
         "symfony/dotenv": "8.1.*",
         "symfony/flex": "^2",
@@ -20,7 +22,14 @@
         "symfony/messenger": "8.1.*",
         "symfony/runtime": "8.1.*",
         "symfony/scheduler": "8.1.*",
-        "symfony/yaml": "8.1.*"
+        "symfony/stimulus-bundle": "^3.2",
+        "symfony/twig-bundle": "8.1.*",
+        "symfony/ux-live-component": "^3.2",
+        "symfony/ux-react": "^3.2",
+        "symfony/ux-turbo": "^3.2",
+        "symfony/yaml": "8.1.*",
+        "twig/extra-bundle": "^2.12|^3.0",
+        "twig/twig": "^2.12|^3.0"
     },
     "config": {
         "allow-plugins": {
@@ -58,7 +67,8 @@
     "scripts": {
         "auto-scripts": {
             "cache:clear": "symfony-cmd",
-            "assets:install %PUBLIC_DIR%": "symfony-cmd"
+            "assets:install %PUBLIC_DIR%": "symfony-cmd",
+            "importmap:install": "symfony-cmd"
         },
         "post-install-cmd": [
             "@auto-scripts"
