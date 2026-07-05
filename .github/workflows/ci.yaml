@@ -85,3 +85,9 @@ jobs:
           VALIDATE_TRIVY: false
           VALIDATE_BIOME_FORMAT: false
           VALIDATE_BIOME_LINT: false
+          # PHP linting (PHPStan, cs-fixer) already runs in the Tests job with
+          # the project's PHP 8.5 image; super-linter's PHP is too old for our lock
+          VALIDATE_PHP_BUILTIN: false
+          VALIDATE_PHP_PHPCS: false
+          VALIDATE_PHP_PHPSTAN: false
+          VALIDATE_PHP_PSALM: false
