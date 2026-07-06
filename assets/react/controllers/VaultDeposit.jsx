@@ -1,20 +1,12 @@
 import React from 'react';
 import { PrivyProvider, usePrivy, useWallets } from '@privy-io/react-auth';
 import { createWalletClient, custom, publicActions, parseAbi, parseUnits, formatUnits } from 'viem';
+import { base } from 'viem/chains';
 
 // cf. config/abi/README.md — le guide d'intégration SuperVault recommande un
 // buffer de gas ~2x l'estimation pour deposit/redeem/connectPool.
 const TX_GAS_BUFFER = 2n;
 const USDC_DECIMALS = 6;
-
-// Chaîne minimale (pas de RPC HTTP : toutes les lectures/écritures passent par
-// le provider EIP-1193 du wallet embedded Privy, cf. custom(provider) ci-dessous).
-const baseChain = {
-    id: 8453,
-    name: 'Base',
-    nativeCurrency: { name: 'Ether', symbol: 'ETH', decimals: 18 },
-    rpcUrls: { default: { http: [] } },
-};
 
 const usdcAbi = parseAbi([
     'function balanceOf(address account) view returns (uint256)',
@@ -48,10 +40,14 @@ function DepositForm(props) {
     const busy = status === 'approving' || status === 'depositing' || status === 'connecting';
 
     const getClient = React.useCallback(async () => {
+        // Le wallet embedded Privy ne bascule pas automatiquement sur Base : sans ce switch,
+        // ses appels ciblent le réseau par défaut et renvoient "0x" (aucun contrat à cette
+        // adresse sur cette chaîne), comme si le contrat n'existait pas.
+        await wallet.switchChain(base.id);
         const provider = await wallet.getEthereumProvider();
 
         return createWalletClient({
-            chain: baseChain,
+            chain: base,
             transport: custom(provider),
             account: wallet.address,
         }).extend(publicActions);
@@ -254,6 +250,10 @@ export default function VaultDeposit(props) {
             config={{
                 loginMethods: ['email'],
                 embeddedWallets: { ethereum: { createOnLogin: 'users-without-wallets' } },
+                // Sans ça, l'embedded wallet démarre sur le réseau par défaut de Privy
+                // (pas Base) et switchChain(base.id) échoue car Base n'est pas "supported".
+                defaultChain: base,
+                supportedChains: [base],
             }}
         >
             <DepositForm {...props} />
