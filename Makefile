@@ -11,7 +11,7 @@ SYMFONY  = $(PHP) bin/console
 
 # Misc
 .DEFAULT_GOAL = help
-.PHONY        : help build up start down logs sh bash test composer vendor sf cc migrate phpstan deptrac cs cs-fix qa
+.PHONY        : help build up start down logs sh bash test composer vendor sf cc migrate phpstan deptrac cs cs-fix qa lint ci-local
 
 ## —— 🎵 🐳 The Symfony Docker Makefile 🐳 🎵 ——————————————————————————————————
 help: ## Outputs this help screen
@@ -76,3 +76,34 @@ cs-fix: ## Fix code style with php-cs-fixer
 	@$(PHP_CONT) vendor/bin/php-cs-fixer fix
 
 qa: test phpstan deptrac cs ## Run the full quality suite: tests, PHPStan, Deptrac, cs-fixer (dry-run)
+
+lint: ## Run super-linter locally (same config/env as the CI "Lint" job), on the whole codebase
+	@docker run --rm \
+		-e RUN_LOCAL=true \
+		-e VALIDATE_ALL_CODEBASE=true \
+		-e DEFAULT_BRANCH=main \
+		-e VALIDATE_CHECKOV=false \
+		-e VALIDATE_TRIVY=false \
+		-e VALIDATE_BIOME_FORMAT=false \
+		-e VALIDATE_BIOME_LINT=false \
+		-e VALIDATE_PHP_BUILTIN=false \
+		-e VALIDATE_PHP_PHPCS=false \
+		-e VALIDATE_PHP_PHPSTAN=false \
+		-e VALIDATE_PHP_PSALM=false \
+		-e FILTER_REGEX_EXCLUDE='(^|/)(vendor|var|node_modules)/|assets/(vendor|build)/|composer\.(json|lock)|symfony\.lock|importmap\.php|mate/' \
+		-e VALIDATE_JAVASCRIPT_PRETTIER=false \
+		-e VALIDATE_JSON_PRETTIER=false \
+		-e VALIDATE_JSX_PRETTIER=false \
+		-e VALIDATE_MARKDOWN_PRETTIER=false \
+		-e VALIDATE_YAML_PRETTIER=false \
+		-e VALIDATE_JAVASCRIPT_ES=false \
+		-e VALIDATE_JSX=false \
+		-e VALIDATE_MARKDOWN=false \
+		-e VALIDATE_JSCPD=false \
+		-e VALIDATE_NATURAL_LANGUAGE=false \
+		-e VALIDATE_SPELL_CODESPELL=false \
+		-e VALIDATE_BASH=false \
+		-v "$(CURDIR)":/tmp/lint \
+		ghcr.io/super-linter/super-linter:slim-v8
+
+ci-local: qa lint ## Run everything the CI pipeline runs (Tests + Lint), locally, before pushing
