@@ -11,7 +11,7 @@ SYMFONY  = $(PHP) bin/console
 
 # Misc
 .DEFAULT_GOAL = help
-.PHONY        : help build up start down logs sh bash test composer vendor sf cc migrate phpstan deptrac cs cs-fix qa lint ci-local
+.PHONY        : help build up start down logs sh bash test anvil-up anvil-down test-integration composer vendor sf cc migrate phpstan deptrac cs cs-fix qa lint ci-local
 
 ## —— 🎵 🐳 The Symfony Docker Makefile 🐳 🎵 ——————————————————————————————————
 help: ## Outputs this help screen
@@ -41,6 +41,16 @@ bash: ## Connect to the FrankenPHP container via bash so up and down arrows go t
 test: ## Start tests with phpunit, pass the parameter "c=" to add options to phpunit, example: make test c="--filter=WalletAddressTest"
 	@$(eval c ?=)
 	@$(PHP_CONT) bin/phpunit $(c)
+
+## —— Anvil fork (Deposit integration tests) 🔱 —————————————————————————————————
+anvil-up: ## Start the local Base fork (Anvil) used by the Deposit integration tests
+	@$(DOCKER_COMP) --profile integration up -d anvil
+
+anvil-down: ## Stop the Anvil fork
+	@$(DOCKER_COMP) --profile integration stop anvil
+
+test-integration: ## Run the Deposit flow integration tests against Anvil (run "make anvil-up" first)
+	@$(PHP_CONT) sh -c 'BASE_RPC_URL=http://anvil:8545 bin/phpunit --group=integration'
 
 ## —— Composer 🧙 ——————————————————————————————————————————————————————————————
 composer: ## Run composer, pass the parameter "c=" to run a given command, example: make composer c='req symfony/orm-pack'

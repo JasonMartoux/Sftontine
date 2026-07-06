@@ -23,6 +23,14 @@
         </testsuite>
     </testsuites>
 
+    <!-- Integration tests need a running Anvil fork (make anvil-up) and are excluded from the
+         default run; use "make test-integration" to run them explicitly. -->
+    <groups>
+        <exclude>
+            <group>integration</group>
+        </exclude>
+    </groups>
+
     <source ignoreSuppressionOfDeprecations="true"
             ignoreIndirectDeprecations="true"
             restrictNotices="true"

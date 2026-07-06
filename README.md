@@ -104,6 +104,26 @@ Deux pièges non évidents, découverts en testant le login dans un vrai navigat
 - **`react/jsx-runtime` manquant de l'import map** : certaines sous-dépendances du SDK (icônes, UI des connecteurs wallet) utilisent le JSX runtime automatique. Si le navigateur remonte `Failed to resolve module specifier "react/jsx-runtime"`, lancer `bin/console importmap:require react/jsx-runtime` (même version que `react`).
 - **`Dynamic require of "react" is not supported`** : certaines sous-dépendances CJS de la SDK font `require("react")` à l'intérieur d'un wrapper esbuild (`__commonJS`), qu'esbuild ne peut pas convertir statiquement en import ES quand `react` est externalisé. Le banner `shim-banner.js` ci-dessus fournit un polyfill `require()` minimal pour ce seul cas — sans lui, le SDK échoue silencieusement au chargement et rien ne s'affiche.
 
+## Sftontine — Dépôts (M3)
+
+Le flow d'écriture on-chain (approve USDC → deposit → connectPool) est documenté en détail dans `config/abi/README.md` (signatures figées, buffer de gas, comportement `paused`). Points notables côté outillage :
+
+- **`viem`** est résolu normalement via AssetMapper (`bin/console importmap:require viem`) — contrairement au SDK Privy, il n'a pas eu besoin d'être vendorisé manuellement.
+- Le composant `assets/react/controllers/VaultDeposit.jsx` récupère le provider EIP-1193 du wallet embedded Privy via `useWallets()` + `wallet.getEthereumProvider()`, et résout l'adresse du yield pool en direct on-chain (`vault.FUND_MANAGER()` → `fundManager.YIELD_POOL()`) plutôt que de la recevoir du backend, pour ne jamais bloquer le rendu de `/profile` sur un appel RPC.
+- Le suivi de statut de transaction utilise de vrais **Turbo Streams poussés par Mercure** (`symfony/mercure-bundle`, à ajouter via `composer require` si absent — le hub Mercure lui-même tourne déjà dans le conteneur FrankenPHP/Caddy). L'élément à utiliser côté template est `<turbo-mercure-stream-source>` (pas `<turbo-stream-source>`), déjà chargé automatiquement par le contrôleur `turbo-core` — inutile d'activer le contrôleur Stimulus `mercure-turbo-stream`, déprécié.
+
+### Tests d'intégration sur fork Anvil de Base
+
+`tests/Integration/Deposit/DepositFlowTest.php` exerce le vrai flow (approve → deposit → connectPool → confirmation via receipt) contre un fork réel de Base mainnet, sans jamais manipuler de clé privée : le wallet de test est financé en USDC via le cheat code `anvil_setStorageAt` (slot de mapping trouvé par brute-force plutôt que supposé) et exécute des transactions non signées via `anvil_impersonateAccount`.
+
+```bash
+make anvil-up          # démarre le fork (profil docker compose "integration")
+make test-integration   # lance uniquement les tests marqués #[Group('integration')]
+make anvil-down         # arrête le fork
+```
+
+Ce test est exclu de `make test`/`make qa` (groupe PHPUnit `integration`, cf. `phpunit.dist.xml`) car il nécessite le fork démarré. Le RPC public gratuit par défaut (`ANVIL_FORK_RPC_URL`) rejette occasionnellement une requête de state avec une erreur 403 « Archive requests require a personal token », ce qui fait planter Anvil — un simple `docker compose --profile integration up -d anvil --force-recreate` suffit généralement à repartir sur un fork propre ; pour un usage intensif (CI), préférer un provider avec accès archive (Alchemy, Infura, QuickNode…) via `.env.local`.
+
 ## Qualité & CI
 
 - `make qa` : lance en local ce que le job **Tests** de la CI vérifie (PHPUnit, PHPStan, Deptrac, php-cs-fixer en dry-run), dans le conteneur `php`.
