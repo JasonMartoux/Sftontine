@@ -51,8 +51,24 @@ deptrac:
             name: Doctrine
             collectors:
                 -
+                    type: bool
+                    must:
+                        -
+                            type: classNameRegex
+                            value: /^Doctrine\\/
+                    must_not:
+                        -
+                            type: classNameRegex
+                            value: /^Doctrine\\ORM\\Mapping\\/
+        # Narrower than the Doctrine layer above: pure mapping metadata
+        # (attributes), no behavioral coupling. Allowed in Domain so entities
+        # can be mapped without a separate XML/persistence-model layer.
+        -
+            name: DoctrineMappingAttributes
+            collectors:
+                -
                     type: classNameRegex
-                    value: /^Doctrine\\/
+                    value: /^Doctrine\\ORM\\Mapping\\/
         -
             name: VendorMisc
             collectors:
@@ -64,6 +80,7 @@ deptrac:
         # Dependency arrow always points inward
         Domain:
             - Money # pure value-object library, allowed in the domain
+            - DoctrineMappingAttributes # metadata only, read via reflection, no runtime coupling
         Application:
             - Domain
             - Money

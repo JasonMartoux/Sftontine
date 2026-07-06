@@ -30,3 +30,16 @@ services:
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
     # Composition root: bind Application ports to Infrastructure adapters here
+    App\Application\Identity\Port\PrivyTokenVerifierInterface: '@App\Infrastructure\Privy\PrivyJwtVerifier'
+    App\Application\Identity\Port\PrivyIdentityTokenVerifierInterface: '@App\Infrastructure\Privy\PrivyIdentityTokenVerifier'
+    App\Application\Identity\Port\UserRepositoryInterface: '@App\Infrastructure\Persistence\DoctrineUserRepository'
+
+    App\Infrastructure\Privy\PrivyJwtVerifier:
+        arguments:
+            $privyAppId: '%env(PRIVY_APP_ID)%'
+            $verificationKey: '%env(PRIVY_VERIFICATION_KEY)%'
+
+    App\Infrastructure\Privy\PrivyIdentityTokenVerifier:
+        arguments:
+            $privyAppId: '%env(PRIVY_APP_ID)%'
+            $verificationKey: '%env(PRIVY_VERIFICATION_KEY)%'

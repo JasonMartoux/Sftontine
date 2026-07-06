@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  * Returns the importmap for this application.
  *
@@ -35,4 +33,6 @@ return [
     'react-dom' => ['version' => '19.2.7'],
     '@symfony/ux-react' => ['path' => './vendor/symfony/ux-react/assets/dist/loader.js'],
     '@hotwired/turbo' => ['version' => '8.0.23'],
+    '@privy-io/react-auth' => ['path' => './assets/vendor/privy/privy-react-auth.esm.js'],
+    'react/jsx-runtime' => ['version' => '19.2.7'],
 ];

@@ -16,7 +16,7 @@ indent_size = 2
 indent_size = 4
 
 [**/{Dockerfile,Caddyfile,*.sh}]
-indent_style = tab
+indent_style = space
 
 [**.md]
 indent_size = unset
@@ -25,3 +25,6 @@ indent_style = unset
 # Symfony recipe XML files align attributes, not a fixed padding grid
 [*.xml]
 indent_size = unset
+
+[Makefile]
+indent_style = tab

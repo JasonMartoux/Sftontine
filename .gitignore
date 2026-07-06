@@ -26,3 +26,4 @@
 ###< symfony/asset-mapper ###
 assets/react/build/node_modules/
 graphify-out/
+/.idea/

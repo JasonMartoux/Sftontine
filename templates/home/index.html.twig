@@ -7,6 +7,10 @@
         <h1>Sftontine</h1>
         <p>Épargne collective en USDC, yield streamé en temps réel via SuperVault.</p>
 
+        <section>
+            <div {{ react_component('PrivyLogin', { appId: privy_app_id, clientId: privy_app_client_id }) }}></div>
+        </section>
+
         <h2>Démo du socle UX</h2>
 
         {# Îlot React (le futur widget Privy sera monté de la même façon) #}

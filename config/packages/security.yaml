@@ -1,0 +1,21 @@
+security:
+    providers:
+        privy_users:
+            id: App\Infrastructure\Security\SecurityUserProvider
+
+    firewalls:
+        dev:
+            pattern: ^/(_(profiler|wdt)|css|images|js)/
+            security: false
+        main:
+            lazy: true
+            provider: privy_users
+            custom_authenticators:
+                - App\Infrastructure\Security\PrivyAuthenticator
+            logout:
+                path: app_logout
+
+    access_control:
+        - { path: ^/auth/privy, roles: PUBLIC_ACCESS }
+        - { path: ^/profile, roles: ROLE_USER }
+        - { path: ^/, roles: PUBLIC_ACCESS }
