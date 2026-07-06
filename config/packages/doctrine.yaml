@@ -10,6 +10,7 @@ doctrine:
 
         types:
             wallet_address: App\Infrastructure\Persistence\Type\WalletAddressType
+            transaction_hash: App\Infrastructure\Persistence\Type\TransactionHashType
     orm:
         naming_strategy: doctrine.orm.naming_strategy.underscore
         identity_generation_preferences:

@@ -1,0 +1,19 @@
+{% if deposit_transaction is null %}
+    <p style="margin: 0; color: #666;">Aucun dépôt en cours.</p>
+{% else %}
+    <p style="margin: 0;">
+        Statut :
+        {%- if deposit_transaction.status.value == 'pending' %} en attente de confirmation…
+        {%- elseif deposit_transaction.status.value == 'confirmed' %} confirmé
+        {%- else %} échoué
+        {%- endif %}
+    </p>
+
+    {% if deposit_transaction.amountDisplay is not null %}
+        <p style="margin: 0;">Montant : {{ deposit_transaction.amountDisplay }} USDC</p>
+    {% endif %}
+
+    <p style="margin: 0;">
+        <a href="{{ base_explorer_url }}/tx/{{ deposit_transaction.txHash }}" target="_blank" rel="noopener">Voir sur BaseScan</a>
+    </p>
+{% endif %}

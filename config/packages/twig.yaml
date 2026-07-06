@@ -4,6 +4,9 @@ twig:
         privy_app_id: '%env(PRIVY_APP_ID)%'
         privy_app_client_id: '%env(PRIVY_APP_CLIENT_ID)%'
         base_explorer_url: '%env(BASE_EXPLORER_URL)%'
+        vault_address: '%env(VAULT_ADDRESS)%'
+        usdc_address: '%env(USDC_ADDRESS)%'
+        gda_forwarder_address: '%env(GDA_FORWARDER_ADDRESS)%'
 
 when@test:
     twig:

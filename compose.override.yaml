@@ -36,3 +36,25 @@ services:
     ports:
       - "5432"
 ###< doctrine/doctrine-bundle ###
+
+  # Local fork of Base mainnet for the Deposit integration tests (JAS-19/M6). Not started by
+  # `docker compose up` — opt in with `make anvil-up` (profile "integration"). Reused by M5/M6
+  # for withdraw/E2E test infra.
+  #
+  # The default free public RPC occasionally rejects a storage/state lookup with a 403
+  # "Archive requests require a personal token" error, which crashes Anvil outright — observed
+  # while brute-forcing the USDC balance storage slot in DepositFlowTest. If `make anvil-up`
+  # crashes, either retry (`docker compose --profile integration up -d anvil --force-recreate`,
+  # usually transient) or set ANVIL_FORK_RPC_URL to an archive-capable provider (Alchemy,
+  # Infura, QuickNode...) in `.env.local`.
+  anvil:
+    image: ghcr.io/foundry-rs/foundry:latest
+    profiles: ["integration"]
+    entrypoint: ["anvil"]
+    command:
+      - "--host"
+      - "0.0.0.0"
+      - "--fork-url"
+      - "${ANVIL_FORK_RPC_URL:-https://base-rpc.publicnode.com}"
+    ports:
+      - "8545"

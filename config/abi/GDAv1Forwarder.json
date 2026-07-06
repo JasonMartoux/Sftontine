@@ -8,5 +8,15 @@
             { "name": "member", "type": "address" }
         ],
         "outputs": [{ "name": "", "type": "bool" }]
+    },
+    {
+        "type": "function",
+        "name": "connectPool",
+        "stateMutability": "nonpayable",
+        "inputs": [
+            { "name": "pool", "type": "address" },
+            { "name": "userData", "type": "bytes" }
+        ],
+        "outputs": [{ "name": "", "type": "bool" }]
     }
 ]

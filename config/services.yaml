@@ -60,3 +60,17 @@ services:
         arguments:
             $vaultAddress: '%env(VAULT_ADDRESS)%'
             $gdaForwarderAddress: '%env(GDA_FORWARDER_ADDRESS)%'
+
+    App\Application\Deposit\Port\TransactionReceiptReaderInterface: '@App\Infrastructure\Gateways\EthReceiptReader'
+    # DepositTransactionStatusPublisher decorates the Doctrine repository so every save()
+    # also pushes a Turbo Stream update over Mercure (see config/packages/mercure.yaml).
+    App\Application\Deposit\Port\DepositTransactionRepositoryInterface: '@App\Infrastructure\Mercure\DepositTransactionStatusPublisher'
+
+    App\Infrastructure\Mercure\DepositTransactionStatusPublisher:
+        arguments:
+            $inner: '@App\Infrastructure\Persistence\DoctrineDepositTransactionRepository'
+
+    App\Infrastructure\Gateways\EthReceiptReader:
+        arguments:
+            $baseRpcUrl: '%env(BASE_RPC_URL)%'
+            $vaultAddress: '%env(VAULT_ADDRESS)%'
