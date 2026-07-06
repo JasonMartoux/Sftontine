@@ -1,0 +1,64 @@
+<div {{ attributes }} data-poll="delay(30000)|$render" style="border: 1px solid #ddd; border-radius: 8px; padding: 1.5rem; max-width: 28rem;">
+    {% if this.hasPosition() %}
+        <p style="margin: 0 0 .5rem; text-transform: uppercase; font-size: .75rem; color: #666;">Ma position SuperVault</p>
+
+        <p style="margin: 0;">Principal déposé</p>
+        <p style="margin: 0 0 1rem; font-size: 1.5rem; font-weight: bold;">${{ this.getPrincipalDisplay() }}</p>
+
+        <p style="margin: 0;">Yield reçu (temps réel)</p>
+        <p style="margin: 0 0 1rem; font-size: 1.5rem; font-weight: bold;">
+            $<span data-controller="flowing-balance"
+                   data-flowing-balance-balance-value="{{ this.getYieldReceivedDisplay() }}"
+                   data-flowing-balance-timestamp-value="{{ this.getCapturedAtTimestamp() }}"
+                   data-flowing-balance-flow-rate-per-second-value="{{ this.getFlowRatePerSecondDisplay() }}"
+                   data-flowing-balance-decimals-value="9">{{ this.getYieldReceivedDisplay() }}</span>
+        </p>
+
+        <p style="margin: 0; color: #666;">APR courant : <strong>{{ this.getAprPercent() }}%</strong></p>
+
+        {% if not this.isConnected() %}
+            <p style="color: #b45309;">⚠️ Stream non connecté au wallet — le yield s'accumule mais n'est pas encore réclamable en temps réel.</p>
+        {% endif %}
+        {% if this.isPaused() %}
+            <p style="color: #b91c1c;">⚠️ Le vault est actuellement en pause (dépôts/retraits bloqués).</p>
+        {% endif %}
+    {% else %}
+        <p style="margin: 0 0 .5rem; text-transform: uppercase; font-size: .75rem; color: #666;">Live preview · pas encore déposé</p>
+        <p style="margin: 0 0 1rem; font-size: 1.25rem; font-weight: bold;">{{ this.getAprPercent() }}% APR</p>
+
+        <p style="margin: 0; color: #666;">Si vous déposiez, vous gagneriez — en temps réel</p>
+        <p style="margin: 0 0 1rem; font-size: 2rem; font-weight: bold;">
+            $<span data-controller="flowing-balance"
+                   data-flowing-balance-balance-value="0"
+                   data-flowing-balance-timestamp-value="{{ "now"|date('U') }}"
+                   data-flowing-balance-flow-rate-per-second-value="{{ this.getFlowRatePerSecondDisplay() }}"
+                   data-flowing-balance-decimals-value="9">0</span>
+        </p>
+
+        <dl style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: .5rem; text-align: center; margin: 0 0 1rem;">
+            <div>
+                <dt style="color: #666; font-size: .75rem;">par seconde</dt>
+                <dd style="margin: 0;">${{ this.getFlowRatePerSecondDisplay() }}</dd>
+            </div>
+            <div>
+                <dt style="color: #666; font-size: .75rem;">par jour</dt>
+                <dd style="margin: 0;">${{ this.getPerDayDisplay() }}</dd>
+            </div>
+            <div>
+                <dt style="color: #666; font-size: .75rem;">par an</dt>
+                <dd style="margin: 0;">${{ this.getPerYearDisplay() }}</dd>
+            </div>
+        </dl>
+
+        <label for="preview-amount" style="display: block; margin-bottom: .25rem; color: #666;">Montant de prévisualisation</label>
+        <select id="preview-amount" data-model="previewAmount" style="padding: .25rem .5rem;">
+            <option value="10" {{ this.previewAmount == '10' ? 'selected' : '' }}>$10</option>
+            <option value="100" {{ this.previewAmount == '100' ? 'selected' : '' }}>$100</option>
+            <option value="1000" {{ this.previewAmount == '1000' ? 'selected' : '' }}>$1,000</option>
+        </select>
+
+        <p style="margin-top: 1rem; color: #666; font-size: .875rem;">
+            Ceci est une simulation. Connectez-vous et déposez pour gagner de l'USDC réel — le principal est retirable à tout moment.
+        </p>
+    {% endif %}
+</div>

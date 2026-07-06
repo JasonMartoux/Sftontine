@@ -1,0 +1,12 @@
+[
+    {
+        "type": "function",
+        "name": "isMemberConnected",
+        "stateMutability": "view",
+        "inputs": [
+            { "name": "pool", "type": "address" },
+            { "name": "member", "type": "address" }
+        ],
+        "outputs": [{ "name": "", "type": "bool" }]
+    }
+]

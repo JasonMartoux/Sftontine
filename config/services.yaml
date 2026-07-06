@@ -43,3 +43,20 @@ services:
         arguments:
             $privyAppId: '%env(PRIVY_APP_ID)%'
             $verificationKey: '%env(PRIVY_VERIFICATION_KEY)%'
+
+    App\Application\Vault\Port\BlockchainReaderInterface: '@App\Infrastructure\Gateways\EthCallBlockchainReader'
+    App\Application\Vault\Port\VaultAddressResolverInterface: '@App\Infrastructure\Gateways\CachedVaultAddressResolver'
+    App\Application\Vault\Port\YieldSnapshotRepositoryInterface: '@App\Infrastructure\Persistence\DoctrineYieldSnapshotRepository'
+
+    App\Infrastructure\Gateways\EthCallBlockchainReader:
+        arguments:
+            $baseRpcUrl: '%env(BASE_RPC_URL)%'
+
+    App\Infrastructure\Gateways\CachedVaultAddressResolver:
+        arguments:
+            $vaultAddress: '%env(VAULT_ADDRESS)%'
+
+    App\Application\Vault\UseCase\VaultPositionReader:
+        arguments:
+            $vaultAddress: '%env(VAULT_ADDRESS)%'
+            $gdaForwarderAddress: '%env(GDA_FORWARDER_ADDRESS)%'

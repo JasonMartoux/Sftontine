@@ -40,5 +40,8 @@
     </source>
 
     <extensions>
+        <bootstrap class="Zenstruck\Foundry\PHPUnit\FoundryExtension">
+            <parameter name="enabled-auto-reset" value="true" />
+        </bootstrap>
     </extensions>
 </phpunit>

@@ -25,4 +25,12 @@ final readonly class DoctrineUserRepository implements UserRepositoryInterface
         $this->entityManager->persist($user);
         $this->entityManager->flush();
     }
+
+    /**
+     * @return list<User>
+     */
+    public function findAll(): array
+    {
+        return $this->entityManager->getRepository(User::class)->findAll();
+    }
 }

@@ -11,4 +11,9 @@ interface UserRepositoryInterface
     public function findByPrivySubjectId(string $subjectId): ?User;
 
     public function save(User $user): void;
+
+    /**
+     * @return list<User>
+     */
+    public function findAll(): array;
 }

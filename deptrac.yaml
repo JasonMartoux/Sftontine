@@ -36,6 +36,12 @@ deptrac:
                     type: classNameRegex
                     value: /^Money\\/
         -
+            name: BcMath
+            collectors:
+                -
+                    type: classNameRegex
+                    value: /^BcMath\\/
+        -
             name: Psr
             collectors:
                 -
@@ -74,21 +80,24 @@ deptrac:
             collectors:
                 -
                     type: classNameRegex
-                    value: /^(Firebase|kornrunner|Twig|Monolog|BcMath)\\/
+                    value: /^(Firebase|kornrunner|Twig|Monolog)\\/
 
     ruleset:
         # Dependency arrow always points inward
         Domain:
             - Money # pure value-object library, allowed in the domain
+            - BcMath # native PHP extension class, raw on-chain uint256/int96 values
             - DoctrineMappingAttributes # metadata only, read via reflection, no runtime coupling
         Application:
             - Domain
             - Money
+            - BcMath
             - Psr # PSR interfaces only (clock, logger), never implementations
         Infrastructure:
             - Application
             - Domain
             - Money
+            - BcMath
             - Psr
             - Symfony
             - Doctrine
@@ -97,6 +106,7 @@ deptrac:
             - Application
             - Domain
             - Money
+            - BcMath
             - Psr
             - Symfony
             - VendorMisc
