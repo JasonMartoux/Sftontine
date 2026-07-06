@@ -1,0 +1,15 @@
+#!/bin/sh
+# Runs the same checks as CI (Tests + Lint) before allowing a push.
+# Bypass in an emergency with: git push --no-verify
+#
+# Enable this hooks directory once per clone with:
+#   git config core.hooksPath .githooks
+
+echo "[pre-push] Running make ci-local (qa + lint) before push..."
+
+if ! make -C "$(git rev-parse --show-toplevel)" ci-local; then
+    echo "[pre-push] ci-local failed - push aborted. Fix the issues above, or use --no-verify to bypass." >&2
+    exit 1
+fi
+
+echo "[pre-push] ci-local passed."

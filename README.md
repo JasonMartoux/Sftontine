@@ -104,6 +104,22 @@ Deux pièges non évidents, découverts en testant le login dans un vrai navigat
 - **`react/jsx-runtime` manquant de l'import map** : certaines sous-dépendances du SDK (icônes, UI des connecteurs wallet) utilisent le JSX runtime automatique. Si le navigateur remonte `Failed to resolve module specifier "react/jsx-runtime"`, lancer `bin/console importmap:require react/jsx-runtime` (même version que `react`).
 - **`Dynamic require of "react" is not supported`** : certaines sous-dépendances CJS de la SDK font `require("react")` à l'intérieur d'un wrapper esbuild (`__commonJS`), qu'esbuild ne peut pas convertir statiquement en import ES quand `react` est externalisé. Le banner `shim-banner.js` ci-dessus fournit un polyfill `require()` minimal pour ce seul cas — sans lui, le SDK échoue silencieusement au chargement et rien ne s'affiche.
 
+## Qualité & CI
+
+- `make qa` : lance en local ce que le job **Tests** de la CI vérifie (PHPUnit, PHPStan, Deptrac, php-cs-fixer en dry-run), dans le conteneur `php`.
+- `make lint` : reproduit le job **Lint** de la CI (super-linter — editorconfig, dotenv-linter, gitleaks, shfmt, YAML, actionlint…) en local via Docker, avec exactement les mêmes variables d'environnement que `.github/workflows/ci.yaml`.
+- `make ci-local` : les deux à la suite — ce que la CI GitHub Actions exécute, avant de pousser.
+
+### Hook `pre-push`
+
+Un hook `pre-push` versionné (`.githooks/pre-push`) lance `make ci-local` avant chaque `git push` et bloque le push si ça échoue. `.git/hooks/` n'étant pas versionné par Git, l'activer une fois par clone :
+
+```bash
+git config core.hooksPath .githooks
+```
+
+En cas d'urgence, le contourner avec `git push --no-verify`.
+
 ## License
 
 Symfony Docker is available under the MIT License.
