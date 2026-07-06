@@ -25,3 +25,6 @@ indent_style = unset
 # Symfony recipe XML files align attributes, not a fixed padding grid
 [*.xml]
 indent_size = unset
+
+[Makefile]
+indent_style = tab

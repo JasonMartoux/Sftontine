@@ -22,7 +22,12 @@
 
 ###> symfony/asset-mapper ###
 /public/assets/
-/assets/vendor/
+# Packages resolved via importmap:require (CDN-fetched by `composer install`) stay ignored;
+# @privy-io/react-auth is a manually pre-bundled `path` entry with no auto-fetch, so it must
+# be committed — see README "Le SDK @privy-io/react-auth est vendorisé" for how to regenerate it.
+/assets/vendor/*
+!/assets/vendor/privy/
 ###< symfony/asset-mapper ###
 assets/react/build/node_modules/
 graphify-out/
+/.idea/

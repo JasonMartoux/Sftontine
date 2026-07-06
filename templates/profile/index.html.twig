@@ -1,0 +1,23 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mon profil — Sftontine{% endblock %}
+
+{% block body %}
+    <main style="max-width: 40rem; margin: 4rem auto; font-family: system-ui, sans-serif;">
+        <h1>Mon profil</h1>
+
+        <dl>
+            <dt>Email</dt>
+            <dd>{{ user.email ?? 'Non renseigné' }}</dd>
+
+            <dt>Wallet</dt>
+            <dd>
+                <a href="{{ base_explorer_url }}/address/{{ user.walletAddress }}" target="_blank" rel="noopener">
+                    {{ user.walletAddress }}
+                </a>
+            </dd>
+        </dl>
+
+        <div {{ react_component('PrivyLogout') }}></div>
+    </main>
+{% endblock %}

@@ -6,4 +6,6 @@ description = "Symfony dev/test-only secrets committed by the framework recipes"
 paths = [
     '''\.env\.dev$''',
     '''\.env\.test$''',
+    # Throwaway ES256 key pair used only to sign fixture JWTs in tests, not a real Privy secret
+    '''tests/Fixtures/privy_test_private_key\.pem$''',
 ]
