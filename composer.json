@@ -7,6 +7,7 @@
     "prefer-stable": true,
     "require": {
         "php": ">=8.5.7",
+        "ext-bcmath": "*",
         "ext-ctype": "*",
         "ext-iconv": "*",
         "doctrine/doctrine-bundle": "^3.2",
@@ -14,6 +15,7 @@
         "doctrine/orm": "^3.6",
         "firebase/php-jwt": "*",
         "kornrunner/keccak": "*",
+        "moneyphp/money": "^4.9",
         "symfony/asset": "8.1.*",
         "symfony/asset-mapper": "8.1.*",
         "symfony/console": "8.1.*",
@@ -113,7 +115,9 @@
         "symfony/ai-symfony-mate-extension": "^0.10.0",
         "symfony/browser-kit": "8.1.*",
         "symfony/css-selector": "8.1.*",
+        "symfony/maker-bundle": "^1.67",
         "symfony/stopwatch": "8.1.*",
-        "symfony/web-profiler-bundle": "8.1.*"
+        "symfony/web-profiler-bundle": "8.1.*",
+        "zenstruck/foundry": "^2.10"
     }
 }

@@ -1,0 +1,23 @@
+[
+    {
+        "type": "function",
+        "name": "getTotalAmountReceivedByMember",
+        "stateMutability": "view",
+        "inputs": [{ "name": "memberAddr", "type": "address" }],
+        "outputs": [{ "name": "totalAmountReceived", "type": "uint256" }]
+    },
+    {
+        "type": "function",
+        "name": "getMemberFlowRate",
+        "stateMutability": "view",
+        "inputs": [{ "name": "memberAddr", "type": "address" }],
+        "outputs": [{ "name": "", "type": "int96" }]
+    },
+    {
+        "type": "function",
+        "name": "getUnits",
+        "stateMutability": "view",
+        "inputs": [{ "name": "memberAddr", "type": "address" }],
+        "outputs": [{ "name": "", "type": "uint128" }]
+    }
+]

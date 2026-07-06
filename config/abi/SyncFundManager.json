@@ -1,0 +1,31 @@
+[
+    {
+        "type": "function",
+        "name": "YIELD_POOL",
+        "stateMutability": "view",
+        "inputs": [],
+        "outputs": [{ "name": "", "type": "address" }]
+    },
+    {
+        "type": "function",
+        "name": "FEE_POOL",
+        "stateMutability": "view",
+        "inputs": [],
+        "outputs": [{ "name": "", "type": "address" }]
+    },
+    {
+        "type": "function",
+        "name": "totalManagedAssets",
+        "stateMutability": "view",
+        "inputs": [],
+        "outputs": [{ "name": "", "type": "uint256" }]
+    },
+    {
+        "type": "function",
+        "name": "stableYieldRate",
+        "stateMutability": "view",
+        "inputs": [],
+        "outputs": [{ "name": "", "type": "uint256" }],
+        "comment": "Basis points, e.g. 100 <=> 1% APR (natspec confirmed on deployed source)"
+    }
+]

@@ -77,10 +77,10 @@ cs-fix: ## Fix code style with php-cs-fixer
 
 qa: test phpstan deptrac cs ## Run the full quality suite: tests, PHPStan, Deptrac, cs-fixer (dry-run)
 
-lint: ## Run super-linter locally (same config/env as the CI "Lint" job), on the whole codebase
+lint: ## Run super-linter locally (same config/env as the CI "Lint" job): only files changed vs main, not the whole codebase
 	@docker run --rm \
 		-e RUN_LOCAL=true \
-		-e VALIDATE_ALL_CODEBASE=true \
+		-e VALIDATE_ALL_CODEBASE=false \
 		-e DEFAULT_BRANCH=main \
 		-e VALIDATE_CHECKOV=false \
 		-e VALIDATE_TRIVY=false \

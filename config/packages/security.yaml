@@ -16,6 +16,6 @@ security:
                 path: app_logout
 
     access_control:
-        - { path: ^/auth/privy, roles: PUBLIC_ACCESS }
-        - { path: ^/profile, roles: ROLE_USER }
-        - { path: ^/, roles: PUBLIC_ACCESS }
+        - {path: ^/auth/privy, roles: PUBLIC_ACCESS}
+        - {path: ^/profile, roles: ROLE_USER}
+        - {path: ^/, roles: PUBLIC_ACCESS}

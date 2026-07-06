@@ -140,6 +140,15 @@
             ".editorconfig"
         ]
     },
+    "symfony/maker-bundle": {
+        "version": "1.67",
+        "recipe": {
+            "repo": "github.com/symfony/recipes",
+            "branch": "main",
+            "version": "1.0",
+            "ref": "fadbfe33303a76e25cb63401050439aa9b1a9c7f"
+        }
+    },
     "symfony/messenger": {
         "version": "8.1",
         "recipe": {
@@ -302,5 +311,18 @@
     },
     "twig/extra-bundle": {
         "version": "v3.24.0"
+    },
+    "zenstruck/foundry": {
+        "version": "2.10",
+        "recipe": {
+            "repo": "github.com/symfony/recipes",
+            "branch": "main",
+            "version": "2.7",
+            "ref": "9bd824886195ebe64a24438db1b6d17eb833ac56"
+        },
+        "files": [
+            "config/packages/zenstruck_foundry.yaml",
+            "src/Story/AppStory.php"
+        ]
     }
 }
