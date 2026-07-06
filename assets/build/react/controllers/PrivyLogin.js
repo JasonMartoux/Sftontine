@@ -52,6 +52,7 @@ export default function PrivyLogin(props) {
     appId: props.appId,
     clientId: props.clientId,
     config: {
+      loginMethods: ['email'],
       embeddedWallets: {
         ethereum: {
           createOnLogin: 'users-without-wallets'
