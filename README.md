@@ -81,7 +81,7 @@ Pour régénérer ce bundle (montée de version du SDK, ajout d'un export type `
 mkdir /tmp/privy-bundle && cd /tmp/privy-bundle
 npm init -y
 npm install @privy-io/react-auth@<version> esbuild
-echo "export { PrivyProvider, usePrivy, useIdentityToken } from '@privy-io/react-auth';" > entry.js
+echo "export { PrivyProvider, usePrivy, useIdentityToken, useWallets } from '@privy-io/react-auth';" > entry.js
 cat > shim-banner.js << 'EOF'
 import * as __ReactNS from "react";
 if (typeof globalThis.require === "undefined") {
@@ -99,10 +99,11 @@ npx esbuild entry.js --bundle --format=esm --platform=browser --target=es2022 \
 cp privy-react-auth.esm.js <repo>/assets/vendor/privy/privy-react-auth.esm.js
 ```
 
-Deux pièges non évidents, découverts en testant le login dans un vrai navigateur :
+Trois pièges non évidents, découverts en testant dans un vrai navigateur :
 
 - **`react/jsx-runtime` manquant de l'import map** : certaines sous-dépendances du SDK (icônes, UI des connecteurs wallet) utilisent le JSX runtime automatique. Si le navigateur remonte `Failed to resolve module specifier "react/jsx-runtime"`, lancer `bin/console importmap:require react/jsx-runtime` (même version que `react`).
 - **`Dynamic require of "react" is not supported`** : certaines sous-dépendances CJS de la SDK font `require("react")` à l'intérieur d'un wrapper esbuild (`__commonJS`), qu'esbuild ne peut pas convertir statiquement en import ES quand `react` est externalisé. Le banner `shim-banner.js` ci-dessus fournit un polyfill `require()` minimal pour ce seul cas — sans lui, le SDK échoue silencieusement au chargement et rien ne s'affiche.
+- **Le bundle vendorisé n'exporte que ce qui est listé dans `entry.js`** : ajouter un composant qui a besoin d'un autre hook Privy (ex. `useWallets` pour lire le wallet embedded, cf. M3/`VaultDeposit.jsx`) échoue avec `The requested module '@privy-io/react-auth' does not provide an export named 'useWallets'` tant que le bundle n'a pas été régénéré avec ce hook ajouté à `entry.js`. Le check statique (`make qa`) ne le détecte pas — seul un vrai chargement navigateur le révèle.
 
 ## Sftontine — Dépôts (M3)
 
