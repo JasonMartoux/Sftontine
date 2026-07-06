@@ -1,12 +1,21 @@
 import React from 'react';
 import { PrivyProvider, usePrivy, useWallets } from '@privy-io/react-auth';
 import { createWalletClient, custom, publicActions, parseAbi, parseUnits, formatUnits } from 'viem';
-import { base } from 'viem/chains';
 
 // cf. config/abi/README.md — le guide d'intégration SuperVault recommande un
 // buffer de gas ~2x l'estimation pour deposit/redeem/connectPool.
 const TX_GAS_BUFFER = 2n;
 const USDC_DECIMALS = 6;
+
+// Défini à la main (plutôt qu'importé de 'viem/chains') pour éviter de tirer une trentaine
+// de sous-modules transitifs (ox/P256, WebAuthn, Secp256k1...) inutiles ici — seuls id/
+// nativeCurrency/rpcUrls sont nécessaires à Privy (config PrivyProvider) et viem (createWalletClient).
+const base = {
+    id: 8453,
+    name: 'Base',
+    nativeCurrency: { name: 'Ether', symbol: 'ETH', decimals: 18 },
+    rpcUrls: { default: { http: ['https://mainnet.base.org'] } },
+};
 
 const usdcAbi = parseAbi([
     'function balanceOf(address account) view returns (uint256)',
