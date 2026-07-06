@@ -8,10 +8,10 @@
         <p style="margin: 0;">Yield reçu (temps réel)</p>
         <p style="margin: 0 0 1rem; font-size: 1.5rem; font-weight: bold;">
             $<span data-controller="flowing-balance"
-                   data-flowing-balance-balance-value="{{ this.getYieldReceivedDisplay() }}"
-                   data-flowing-balance-timestamp-value="{{ this.getCapturedAtTimestamp() }}"
-                   data-flowing-balance-flow-rate-per-second-value="{{ this.getFlowRatePerSecondDisplay() }}"
-                   data-flowing-balance-decimals-value="9">{{ this.getYieldReceivedDisplay() }}</span>
+                data-flowing-balance-balance-value="{{ this.getYieldReceivedDisplay() }}"
+                data-flowing-balance-timestamp-value="{{ this.getCapturedAtTimestamp() }}"
+                data-flowing-balance-flow-rate-per-second-value="{{ this.getFlowRatePerSecondDisplay() }}"
+                data-flowing-balance-decimals-value="9">{{ this.getYieldReceivedDisplay() }}</span>
         </p>
 
         <p style="margin: 0; color: #666;">APR courant : <strong>{{ this.getAprPercent() }}%</strong></p>
@@ -29,10 +29,10 @@
         <p style="margin: 0; color: #666;">Si vous déposiez, vous gagneriez — en temps réel</p>
         <p style="margin: 0 0 1rem; font-size: 2rem; font-weight: bold;">
             $<span data-controller="flowing-balance"
-                   data-flowing-balance-balance-value="0"
-                   data-flowing-balance-timestamp-value="{{ "now"|date('U') }}"
-                   data-flowing-balance-flow-rate-per-second-value="{{ this.getFlowRatePerSecondDisplay() }}"
-                   data-flowing-balance-decimals-value="9">0</span>
+                data-flowing-balance-balance-value="0"
+                data-flowing-balance-timestamp-value="{{ "now"|date('U') }}"
+                data-flowing-balance-flow-rate-per-second-value="{{ this.getFlowRatePerSecondDisplay() }}"
+                data-flowing-balance-decimals-value="9">0</span>
         </p>
 
         <dl style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: .5rem; text-align: center; margin: 0 0 1rem;">

@@ -1,0 +1,14 @@
+---
+# Relaxes the bundled super-linter yamllint defaults to match this project's actual style:
+# Symfony config/recipe YAML files never use a `---` document marker, and legitimately
+# need long lines for URLs, schema paths, and FQCN service ids.
+extends: default
+
+rules:
+  document-start: disable
+  comments: disable
+  comments-indentation: disable
+  line-length:
+    max: 150
+    allow-non-breakable-words: true
+    allow-non-breakable-inline-mappings: true
