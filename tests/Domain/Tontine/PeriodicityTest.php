@@ -18,6 +18,7 @@ final class PeriodicityTest extends TestCase
         yield 'weekly' => [Periodicity::Weekly, 'P7D'];
         yield 'biweekly' => [Periodicity::Biweekly, 'P14D'];
         yield 'monthly' => [Periodicity::Monthly, 'P1M'];
+        yield 'semiannual' => [Periodicity::Semiannual, 'P6M'];
     }
 
     #[DataProvider('provideIntervals')]
@@ -29,5 +30,34 @@ final class PeriodicityTest extends TestCase
             $start->add(new \DateInterval($expectedSpec)),
             $start->add($periodicity->dateInterval()),
         );
+    }
+
+    public function testDateIntervalThrowsForPunctual(): void
+    {
+        $this->expectException(\UnhandledMatchError::class);
+
+        Periodicity::Punctual->dateInterval();
+    }
+
+    /**
+     * @return iterable<string, array{Periodicity}>
+     */
+    public static function provideRecurringPeriodicities(): iterable
+    {
+        yield 'weekly' => [Periodicity::Weekly];
+        yield 'biweekly' => [Periodicity::Biweekly];
+        yield 'monthly' => [Periodicity::Monthly];
+        yield 'semiannual' => [Periodicity::Semiannual];
+    }
+
+    #[DataProvider('provideRecurringPeriodicities')]
+    public function testIsRecurringIsTrueForRecurringPeriodicities(Periodicity $periodicity): void
+    {
+        self::assertTrue($periodicity->isRecurring());
+    }
+
+    public function testIsRecurringIsFalseForPunctual(): void
+    {
+        self::assertFalse(Periodicity::Punctual->isRecurring());
     }
 }
