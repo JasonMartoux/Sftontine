@@ -710,12 +710,13 @@ git commit -m "Ajoute Semestrielle et Ponctuelle au formulaire de création et a
 ### Task 6: Dashboard hides échéances/statut and shows periodicity for Punctual groups
 
 **Files:**
+- Modify: `src/Presentation/Twig/Components/TontineGroupDashboard.php`
 - Modify: `templates/components/TontineGroupDashboard.html.twig`
 - Test: `tests/Presentation/TontineGroupDashboardTest.php`
 
 **Interfaces:**
-- Consumes: `GroupPotView::$periodicity` (Task 4).
-- Produces: no new interfaces — this task only changes rendered HTML.
+- Consumes: `GroupPotView::$periodicity` (Task 4), `TontineGroupListItem::frenchLabel(mixed $value): string` (Task 5) — reused here instead of duplicating the periodicity→French-label map in Twig.
+- Produces: `TontineGroupDashboard::getPeriodicityLabel(): string` (new public method on the Live Component, delegates to `TontineGroupListItem::frenchLabel()`).
 
 - [ ] **Step 1: Write the failing test**
 
@@ -758,7 +759,28 @@ Run: `make test c="--filter=TontineGroupDashboardTest"`
 Expected: FAIL — the current template always renders "Échéances"/"À jour" (or "En retard")
 regardless of periodicity, and never renders "Ponctuelle" or "Cotisations libres" anywhere.
 
-- [ ] **Step 3: Implement**
+- [ ] **Step 3: Implement — add the label getter to the Live Component**
+
+`TontineGroupListItem::frenchLabel()` (Task 5) already maps every periodicity value to its
+French label — reuse it here instead of duplicating that map in Twig. In
+`src/Presentation/Twig/Components/TontineGroupDashboard.php`, add the import and a new
+public method, right after `getPot()`:
+
+```php
+use App\Presentation\Http\Dto\TontineGroupListItem;
+```
+(add to the existing `use` block, alphabetically after `use App\Application\Tontine\UseCase\GroupPotReader;` and before `use Symfony\Bundle\SecurityBundle\Security;`)
+
+```php
+    public function getPeriodicityLabel(): string
+    {
+        $pot = $this->getPot();
+
+        return null === $pot ? '' : TontineGroupListItem::frenchLabel($pot->periodicity);
+    }
+```
+
+- [ ] **Step 4: Implement — update the template**
 
 Replace the full content of `templates/components/TontineGroupDashboard.html.twig` with:
 
@@ -768,11 +790,10 @@ Replace the full content of `templates/components/TontineGroupDashboard.html.twi
     {% if pot is null %}
         <p style="color: #b91c1c;">Accès refusé.</p>
     {% else %}
-        {% set periodicityLabels = {'weekly': 'Hebdomadaire', 'biweekly': 'Bimensuelle', 'monthly': 'Mensuelle', 'semiannual': 'Semestrielle', 'punctual': 'Ponctuelle'} %}
         {% set isPunctual = pot.periodicity == 'punctual' %}
 
         <p style="margin: 0 0 .5rem; text-transform: uppercase; font-size: .75rem; color: #666;">Pot commun · {{ pot.name }}</p>
-        <p style="margin: 0 0 .5rem; color: #666;">Périodicité : {{ periodicityLabels[pot.periodicity] ?? pot.periodicity }}</p>
+        <p style="margin: 0 0 .5rem; color: #666;">Périodicité : {{ this.getPeriodicityLabel() }}</p>
         <p style="margin: 0;">Total cotisé</p>
         <p style="margin: 0 0 1rem; font-size: 1.75rem; font-weight: bold;">${{ pot.potTotalDisplay }}</p>
 
@@ -841,17 +862,17 @@ Replace the full content of `templates/components/TontineGroupDashboard.html.twi
 </div>
 ```
 
-- [ ] **Step 4: Run tests to verify they pass**
+- [ ] **Step 5: Run tests to verify they pass**
 
 Run: `make test c="--filter=TontineGroupDashboardTest"`
 Expected: PASS (both tests in the file — re-run the pre-existing
 `testDashboardShowsPotTotalForAMember` too, to confirm the periodicity-label line and the
 `isPunctual` branching didn't break the default weekly-group rendering).
 
-- [ ] **Step 5: Commit**
+- [ ] **Step 6: Commit**
 
 ```bash
-git add templates/components/TontineGroupDashboard.html.twig tests/Presentation/TontineGroupDashboardTest.php
+git add src/Presentation/Twig/Components/TontineGroupDashboard.php templates/components/TontineGroupDashboard.html.twig tests/Presentation/TontineGroupDashboardTest.php
 git commit -m "Dashboard : affiche la périodicité, masque échéances/statut pour Ponctuelle"
 ```
 
