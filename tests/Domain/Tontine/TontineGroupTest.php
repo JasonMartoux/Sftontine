@@ -99,6 +99,36 @@ final class TontineGroupTest extends TestCase
         TontineGroup::create(self::alice(), 'Tontine famille', self::usdc('25000000'), Periodicity::Weekly, 53, new \DateTimeImmutable(self::NOW));
     }
 
+    public function testCreateWithPunctualPeriodicityForcesOneInstallmentAndNoEndDate(): void
+    {
+        $now = new \DateTimeImmutable(self::NOW);
+
+        $group = TontineGroup::create(self::alice(), 'Tontine famille', self::usdc('25000000'), Periodicity::Punctual, 12, $now);
+
+        self::assertSame(1, $group->installmentsPerCycle);
+        $cycle = $group->currentCycle();
+        self::assertNotNull($cycle);
+        self::assertNull($cycle->endsAt);
+    }
+
+    public function testCreateWithPunctualPeriodicityIgnoresOutOfRangeInstallments(): void
+    {
+        $group = TontineGroup::create(self::alice(), 'Tontine famille', self::usdc('25000000'), Periodicity::Punctual, 0, new \DateTimeImmutable(self::NOW));
+
+        self::assertSame(1, $group->installmentsPerCycle);
+    }
+
+    public function testCreateWithSemiannualPeriodicityComputesEndsAtWithSixMonthInterval(): void
+    {
+        $now = new \DateTimeImmutable(self::NOW);
+
+        $group = TontineGroup::create(self::alice(), 'Tontine famille', self::usdc('25000000'), Periodicity::Semiannual, 2, $now);
+
+        $cycle = $group->currentCycle();
+        self::assertNotNull($cycle);
+        self::assertEquals($now->add(new \DateInterval('P12M')), $cycle->endsAt); // 2 × P6M
+    }
+
     public function testJoinAddsMemberWithMemberRoleAndRecordsEvent(): void
     {
         $group = self::makeGroup(self::alice());

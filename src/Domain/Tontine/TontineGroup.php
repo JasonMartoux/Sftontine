@@ -96,15 +96,22 @@ final class TontineGroup
             throw InvalidContributionAmountException::forNonPositiveAmount();
         }
 
-        if ($installmentsPerCycle < self::MIN_INSTALLMENTS_PER_CYCLE || $installmentsPerCycle > self::MAX_INSTALLMENTS_PER_CYCLE) {
-            throw InvalidCycleLengthException::forValue($installmentsPerCycle);
+        if ($periodicity->isRecurring()) {
+            if ($installmentsPerCycle < self::MIN_INSTALLMENTS_PER_CYCLE || $installmentsPerCycle > self::MAX_INSTALLMENTS_PER_CYCLE) {
+                throw InvalidCycleLengthException::forValue($installmentsPerCycle);
+            }
+        } else {
+            $installmentsPerCycle = 1;
         }
 
         $group = new self($name, $contributionAmount->getAmount(), $periodicity, $installmentsPerCycle, TontineGroupStatus::Active, $now);
 
-        $endsAt = $now;
-        for ($i = 0; $i < $installmentsPerCycle; ++$i) {
-            $endsAt = $endsAt->add($periodicity->dateInterval());
+        $endsAt = null;
+        if ($periodicity->isRecurring()) {
+            $endsAt = $now;
+            for ($i = 0; $i < $installmentsPerCycle; ++$i) {
+                $endsAt = $endsAt->add($periodicity->dateInterval());
+            }
         }
         $group->cycles[] = SavingsCycle::open($group, 1, $now, $endsAt);
 
