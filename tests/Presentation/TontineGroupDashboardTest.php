@@ -11,6 +11,7 @@ use App\Domain\Deposit\TransactionHash;
 use App\Domain\Deposit\TransactionReceipt;
 use App\Domain\Identity\User;
 use App\Domain\Identity\WalletAddress;
+use App\Domain\Tontine\Periodicity;
 use App\Tests\Factory\Tontine\TontineGroupFactory;
 use BcMath\Number;
 use Doctrine\ORM\EntityManagerInterface;
@@ -48,6 +49,27 @@ final class TontineGroupDashboardTest extends WebTestCase
 
         self::assertResponseIsSuccessful();
         self::assertSelectorTextContains('body', '$25.000000');
+    }
+
+    public function testDashboardHidesEcheancesAndStatutColumnsForPunctualGroup(): void
+    {
+        $wallet = '0x4444444444444444444444444444444444444444';
+        $client = self::createClient();
+        $this->login($client, 'did:privy:dashboard-punctual', $wallet);
+        $creator = $this->findUser('did:privy:dashboard-punctual');
+        $group = TontineGroupFactory::createOne([
+            'creator' => $creator,
+            'periodicity' => Periodicity::Punctual,
+        ]);
+
+        $client->request('GET', '/tontines/'.$group->id);
+
+        self::assertResponseIsSuccessful();
+        self::assertSelectorTextContains('body', 'Ponctuelle');
+        self::assertSelectorTextContains('body', 'Cotisations libres');
+        self::assertSelectorTextNotContains('body', 'Échéances');
+        self::assertSelectorTextNotContains('body', 'En retard');
+        self::assertSelectorTextNotContains('body', 'À jour');
     }
 
     /**

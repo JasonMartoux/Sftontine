@@ -7,6 +7,7 @@ namespace App\Presentation\Twig\Components;
 use App\Application\Identity\Port\AuthenticatedUserInterface;
 use App\Application\Tontine\Dto\GroupPotView;
 use App\Application\Tontine\UseCase\GroupPotReader;
+use App\Presentation\Http\Dto\TontineGroupListItem;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\UX\LiveComponent\Attribute\AsLiveComponent;
 use Symfony\UX\LiveComponent\Attribute\LiveProp;
@@ -63,5 +64,12 @@ final class TontineGroupDashboard
         $this->view = $isMember ? $view : null;
 
         return $this->view;
+    }
+
+    public function getPeriodicityLabel(): string
+    {
+        $pot = $this->getPot();
+
+        return null === $pot ? '' : TontineGroupListItem::frenchLabel($pot->periodicity);
     }
 }
