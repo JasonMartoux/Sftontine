@@ -22,6 +22,9 @@
             {{ component('VaultPositionDashboard') }}
         </div>
 
+        <h2>Mes tontines</h2>
+        <p><a href="{{ path('app_tontine_index') }}">Voir mes tontines</a> · <a href="{{ path('app_tontine_new') }}">Créer une tontine</a></p>
+
         <div style="margin: 2rem 0;" {{ react_component('VaultDeposit', {
             appId: privy_app_id,
             clientId: privy_app_client_id,

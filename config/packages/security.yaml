@@ -19,4 +19,6 @@ security:
         - {path: ^/auth/privy, roles: PUBLIC_ACCESS}
         - {path: ^/profile, roles: ROLE_USER}
         - {path: ^/vault/deposit, roles: ROLE_USER}
+        - {path: ^/tontines/\d+/rejoindre, roles: PUBLIC_ACCESS}
+        - {path: ^/tontines, roles: ROLE_USER}
         - {path: ^/, roles: PUBLIC_ACCESS}

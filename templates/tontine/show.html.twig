@@ -1,0 +1,49 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ group.name }} — Sftontine{% endblock %}
+
+{% block body %}
+    <main style="max-width: 40rem; margin: 4rem auto; font-family: system-ui, sans-serif;">
+        <p><a href="{{ path('app_tontine_index') }}">← Mes tontines</a></p>
+        <h1>{{ group.name }}</h1>
+        <p style="color: #666;">Cotisation : ${{ group.contributionAmountDisplay }} · {{ group.installmentsPerCycle }} échéances</p>
+
+        {% for message in app.flashes('tontine_success') %}
+            <p style="color: #15803d;">{{ message }}</p>
+        {% endfor %}
+        {% for message in app.flashes('tontine_error') %}
+            <p style="color: #b91c1c;">{{ message }}</p>
+        {% endfor %}
+
+        {% if invitationUrl is not null %}
+            <p style="border: 1px solid #ddd; border-radius: 8px; padding: 1rem;">
+                Lien d'invitation (valable 7 jours) :<br>
+                <input type="text" readonly value="{{ invitationUrl }}" style="width: 100%; padding: .5rem; margin-top: .5rem;" onclick="this.select()">
+            </p>
+        {% endif %}
+
+        <div style="margin: 2rem 0;">
+            {{ component('TontineGroupDashboard', {groupId: group.id}) }}
+        </div>
+
+        <h2>Enregistrer une cotisation</h2>
+        <p style="color: #666;">Déposez d'abord sur le SuperVault, puis enregistrez le hash de la transaction ici pour qu'elle compte dans le pot du groupe.</p>
+
+        <div {{ react_component('VaultDeposit', {
+            appId: privy_app_id,
+            clientId: privy_app_client_id,
+            vaultAddress: vault_address,
+            usdcAddress: usdc_address,
+            gdaForwarderAddress: gda_forwarder_address,
+        }) }}></div>
+
+        <form method="post" action="{{ path('app_tontine_contribute', {id: group.id}) }}">
+            <input type="hidden" name="_token" value="{{ csrf_token('contribute_tontine_' ~ group.id) }}">
+            <p>
+                <label for="txHash">Hash de la transaction de dépôt</label><br>
+                <input type="text" id="txHash" name="txHash" value="{{ latestDeposit ? latestDeposit.txHash : '' }}" required pattern="0x[0-9a-fA-F]{64}" style="width: 100%; padding: .5rem;">
+            </p>
+            <button type="submit">Enregistrer ma cotisation</button>
+        </form>
+    </main>
+{% endblock %}

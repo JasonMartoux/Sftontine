@@ -1,7 +1,7 @@
 import React from 'react';
 import { PrivyProvider, usePrivy, useIdentityToken } from '@privy-io/react-auth';
 
-function LoginButton() {
+function LoginButton({ returnTo }) {
     const { ready, authenticated, login, getAccessToken } = usePrivy();
     const { identityToken } = useIdentityToken();
 
@@ -21,7 +21,8 @@ function LoginButton() {
                 return;
             }
 
-            const response = await fetch('/auth/privy', {
+            const authUrl = returnTo ? `/auth/privy?returnTo=${encodeURIComponent(returnTo)}` : '/auth/privy';
+            const response = await fetch(authUrl, {
                 method: 'POST',
                 headers: {
                     Authorization: `Bearer ${token}`,
@@ -34,7 +35,7 @@ function LoginButton() {
                 window.location.href = redirectUrl ?? '/profile';
             }
         })();
-    }, [ready, authenticated, getAccessToken, identityToken]);
+    }, [ready, authenticated, getAccessToken, identityToken, returnTo]);
 
     if (!ready) {
         return <p>Chargement…</p>;
@@ -59,7 +60,7 @@ export default function PrivyLogin(props) {
                 },
             }}
         >
-            <LoginButton />
+            <LoginButton returnTo={props.returnTo} />
         </PrivyProvider>
     );
 }

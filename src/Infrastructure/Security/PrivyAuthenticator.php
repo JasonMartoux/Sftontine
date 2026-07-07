@@ -77,7 +77,10 @@ final class PrivyAuthenticator extends AbstractAuthenticator
 
     public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $firewallName): Response
     {
-        return new JsonResponse(['redirectUrl' => '/profile']);
+        $returnTo = $request->query->get('returnTo');
+        $isSafeLocalPath = \is_string($returnTo) && str_starts_with($returnTo, '/') && !str_starts_with($returnTo, '//');
+
+        return new JsonResponse(['redirectUrl' => $isSafeLocalPath ? $returnTo : '/profile']);
     }
 
     public function onAuthenticationFailure(Request $request, AuthenticationException $exception): Response
