@@ -58,6 +58,7 @@ final class GroupPotReaderTest extends TestCase
         self::assertNotNull($view);
         self::assertSame(1, $view->groupId);
         self::assertSame('Tontine famille', $view->name);
+        self::assertSame('weekly', $view->periodicity);
         self::assertSame('50.000000', $view->potTotalDisplay);
         self::assertSame(500, $view->aprBasisPoints);
         self::assertSame(1, $view->cycleNumber);
@@ -102,6 +103,26 @@ final class GroupPotReaderTest extends TestCase
         self::assertNotNull($view);
         self::assertSame(0, $view->aprBasisPoints);
         self::assertSame('0.000000', $view->estimatedYieldDisplay);
+    }
+
+    public function testBuildsPotViewForPunctualGroupWithNoCycleEndAndNeverLate(): void
+    {
+        $alice = self::alice();
+        $group = TontineGroup::create($alice, 'Tontine famille', self::usdc('25000000'), Periodicity::Punctual, 12, new \DateTimeImmutable(self::CREATED_AT));
+
+        $groups = $this->createStub(TontineGroupRepositoryInterface::class);
+        $groups->method('find')->willReturn($group);
+
+        $reader = new GroupPotReader($groups, $this->snapshots(500), $this->clock());
+        $view = $reader->read(1);
+
+        self::assertNotNull($view);
+        self::assertSame('punctual', $view->periodicity);
+        self::assertSame(1, $view->cycleNumber);
+        self::assertNull($view->cycleEndsAt);
+        self::assertCount(1, $view->members);
+        self::assertSame(0, $view->members[0]->expectedInstallments);
+        self::assertFalse($view->members[0]->isLate);
     }
 
     private static function alice(): User

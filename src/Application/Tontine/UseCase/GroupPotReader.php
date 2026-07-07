@@ -62,6 +62,7 @@ final readonly class GroupPotReader
         return new GroupPotView(
             groupId: $groupId,
             name: $group->name,
+            periodicity: $group->periodicity->value,
             potTotalDisplay: self::display($potTotal),
             estimatedYieldDisplay: self::display($estimatedYield),
             flowRatePerSecondDisplay: self::flowRatePerSecondDisplay($potTotal, $aprBasisPoints),

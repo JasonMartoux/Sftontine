@@ -12,6 +12,7 @@ final readonly class GroupPotView
     public function __construct(
         public int $groupId,
         public string $name,
+        public string $periodicity,
         public string $potTotalDisplay,
         public string $estimatedYieldDisplay,
         public string $flowRatePerSecondDisplay,
