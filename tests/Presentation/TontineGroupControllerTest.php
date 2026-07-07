@@ -57,6 +57,52 @@ final class TontineGroupControllerTest extends WebTestCase
         self::assertSelectorTextContains('h1', 'Tontine des amis');
     }
 
+    public function testCreateWithPunctualPeriodicityHidesInstallmentsAndSucceeds(): void
+    {
+        $client = self::createClient();
+        $this->login($client, 'did:privy:tontine-create-punctual', '0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa');
+
+        $crawler = $client->request('GET', '/tontines/nouvelle');
+        $token = (string) $crawler->filter('input[name="_token"]')->attr('value');
+
+        $client->request('POST', '/tontines', [
+            '_token' => $token,
+            'name' => 'Cagnotte anniversaire',
+            'amount' => '25',
+            'periodicity' => 'punctual',
+            // No "installments" field submitted at all — the field is hidden client-side
+            // for Ponctuelle, and the server must not require it.
+        ]);
+
+        self::assertResponseRedirects();
+        $client->followRedirect();
+        self::assertResponseIsSuccessful();
+        self::assertSelectorTextContains('h1', 'Cagnotte anniversaire');
+        self::assertSelectorTextContains('body', 'Ponctuelle');
+    }
+
+    public function testCreateWithSemiannualPeriodicitySucceeds(): void
+    {
+        $client = self::createClient();
+        $this->login($client, 'did:privy:tontine-create-semiannual', '0xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb');
+
+        $crawler = $client->request('GET', '/tontines/nouvelle');
+        $token = (string) $crawler->filter('input[name="_token"]')->attr('value');
+
+        $client->request('POST', '/tontines', [
+            '_token' => $token,
+            'name' => 'Tontine semestrielle',
+            'amount' => '100',
+            'periodicity' => 'semiannual',
+            'installments' => '2',
+        ]);
+
+        self::assertResponseRedirects();
+        $client->followRedirect();
+        self::assertResponseIsSuccessful();
+        self::assertSelectorTextContains('h1', 'Tontine semestrielle');
+    }
+
     public function testCreateWithInvalidDataShowsFrenchError(): void
     {
         $client = self::createClient();
