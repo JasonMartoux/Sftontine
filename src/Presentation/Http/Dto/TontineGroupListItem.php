@@ -29,6 +29,8 @@ final class TontineGroupListItem
             'weekly' => 'Hebdomadaire',
             'biweekly' => 'Bimensuelle',
             'monthly' => 'Mensuelle',
+            'semiannual' => 'Semestrielle',
+            'punctual' => 'Ponctuelle',
             default => $value,
         };
     }

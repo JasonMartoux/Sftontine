@@ -25,16 +25,18 @@
 
             <p>
                 <label for="periodicity">Périodicité</label><br>
-                <select id="periodicity" name="periodicity" required style="width: 100%; padding: .5rem;">
+                <select id="periodicity" name="periodicity" required style="width: 100%; padding: .5rem;" onchange="document.getElementById('installments-field').style.display = (this.value === 'punctual') ? 'none' : 'block'">
                     <option value="weekly" {{ periodicity|default('') == 'weekly' ? 'selected' : '' }}>Hebdomadaire</option>
                     <option value="biweekly" {{ periodicity|default('') == 'biweekly' ? 'selected' : '' }}>Bimensuelle</option>
                     <option value="monthly" {{ periodicity|default('') == 'monthly' ? 'selected' : '' }}>Mensuelle</option>
+                    <option value="semiannual" {{ periodicity|default('') == 'semiannual' ? 'selected' : '' }}>Semestrielle</option>
+                    <option value="punctual" {{ periodicity|default('') == 'punctual' ? 'selected' : '' }}>Ponctuelle</option>
                 </select>
             </p>
 
-            <p>
+            <p id="installments-field" style="{{ periodicity|default('') == 'punctual' ? 'display: none;' : '' }}">
                 <label for="installments">Nombre d'échéances du cycle</label><br>
-                <input type="number" id="installments" name="installments" value="{{ installments|default('12') }}" required min="2" max="52" style="width: 100%; padding: .5rem;">
+                <input type="number" id="installments" name="installments" value="{{ installments|default('12') }}" min="2" max="52" style="width: 100%; padding: .5rem;">
             </p>
 
             <button type="submit">Créer</button>
