@@ -39,6 +39,28 @@ final class ContributionScheduleTest extends TestCase
         ], $dueDates);
     }
 
+    public function testDueDatesIsEmptyForPunctualPeriodicity(): void
+    {
+        $group = self::makeGroup();
+        $cycle = SavingsCycle::open($group, 1, new \DateTimeImmutable('2026-01-01T00:00:00+00:00'), null);
+
+        $dueDates = $this->schedule->dueDates($cycle, Periodicity::Punctual, 1);
+
+        self::assertSame([], $dueDates);
+    }
+
+    public function testScheduleMethodsAgreeThereIsNoExpectedInstallmentOrLatenessForPunctual(): void
+    {
+        $group = self::makeGroup();
+        $cycle = SavingsCycle::open($group, 1, new \DateTimeImmutable('2026-01-01T00:00:00+00:00'), null);
+        $membership = self::makeMembership(new \DateTimeImmutable('2026-01-01T00:00:00+00:00'));
+        $now = new \DateTimeImmutable('2027-01-01T00:00:00+00:00');
+
+        self::assertSame(0, $this->schedule->expectedInstallmentsFor($membership, $cycle, Periodicity::Punctual, 1, $now));
+        self::assertSame(0, $this->schedule->missedInstallmentsFor($membership, $cycle, Periodicity::Punctual, 1, $now, paidCount: 0));
+        self::assertNull($this->schedule->nextDueDateFor($membership, $cycle, Periodicity::Punctual, 1, $now));
+    }
+
     public function testExpectedInstallmentsForFounderCountsAllPastDueDates(): void
     {
         $group = self::makeGroup();

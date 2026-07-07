@@ -11,6 +11,10 @@ final readonly class ContributionSchedule
      */
     public function dueDates(SavingsCycle $cycle, Periodicity $periodicity, int $installmentsPerCycle): array
     {
+        if (!$periodicity->isRecurring()) {
+            return [];
+        }
+
         $dueDates = [];
         $dueDate = $cycle->startsAt;
         for ($i = 0; $i < $installmentsPerCycle; ++$i) {
