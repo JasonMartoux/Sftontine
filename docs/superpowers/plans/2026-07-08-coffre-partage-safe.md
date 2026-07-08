@@ -1534,6 +1534,11 @@ No PHPUnit cycle — schema migrations in this codebase aren't unit-tested, veri
 
 Mirrors `EthReceiptReader` exactly: one `eth_getTransactionReceipt` call, manual log decoding (topic0 via keccak, no generic ABI/event library). `getDeploymentReceipt` scans for `ProxyCreation(address,address)` emitted by `$proxyFactoryAddress`; `getExecutionReceipt` scans for `ExecutionSuccess`/`ExecutionFailure(bytes32,uint256)` emitted by the Safe itself (`log.address` is implicitly the Safe — no separate address filter needed since `expectedSafeTxHash` already disambiguates, but for correctness only accept logs whose decoded `txHash` matches `$safeTxHash`).
 
+**Important correction from Task 1's verified ABI** (`config/abi/README.md`'s "Coffre de groupe (Safe)" section — read it before writing this task): both events have an **indexed** parameter, which the original plan draft got wrong. The real signatures are `event ProxyCreation(address indexed proxy, address singleton)` and `event ExecutionSuccess(bytes32 indexed txHash, uint256 payment)` / `ExecutionFailure(bytes32 indexed txHash, uint256 payment)`. An indexed parameter is encoded in the log's `topics` array, **not** in `data` — `data` only holds the non-indexed trailing parameters. This is exactly the same shape `EthReceiptReader::decodeDepositEvent` already handles for the vault's `Deposit(address indexed sender, address indexed owner, uint256 assets, uint256 shares)` event (`sender`/`owner` come from `topics[1]`/`topics[2]`, only `assets`/`shares` come from `data`) — follow that precedent, not a data-word offset.
+
+- `ProxyCreation`: `proxy` (indexed) is `topics[1]`, a 32-byte word — the address is its last 40 hex chars (`'0x'.substr($topics[1], 26)`, same slicing `EthReceiptReader` uses for `sender`/`owner`). `singleton` (not indexed) would be in `data`, but this reader never needs it.
+- `ExecutionSuccess`/`ExecutionFailure`: `txHash` (indexed) is `topics[1]` **in full** — it's already a `bytes32`, so no slicing needed, just compare it directly against the expected `$safeTxHash->value` (case-insensitively). `payment` (not indexed) would be in `data`, but this reader never needs it either.
+
 - [ ] **Step 1: Write the failing tests**
 
   ```php
@@ -1565,11 +1570,15 @@ Mirrors `EthReceiptReader` exactly: one `eth_getTransactionReceipt` call, manual
 
       public function testDeploymentReceiptDecodesProxyCreation(): void
       {
+          // ProxyCreation(address indexed proxy, address singleton) — proxy is indexed
+          // (topics[1]), singleton is not (data). This reader only needs proxy.
           $log = [
               'address' => self::PROXY_FACTORY,
-              'topics' => [self::PROXY_CREATION_TOPIC0],
-              'data' => '0x'.str_pad(strtolower(substr(self::PROXY_ADDRESS, 2)), 64, '0', \STR_PAD_LEFT)
-                  .str_pad(strtolower('55'.str_repeat('5', 39)), 64, '0', \STR_PAD_LEFT),
+              'topics' => [
+                  self::PROXY_CREATION_TOPIC0,
+                  '0x'.str_pad(strtolower(substr(self::PROXY_ADDRESS, 2)), 64, '0', \STR_PAD_LEFT),
+              ],
+              'data' => '0x'.str_pad(strtolower('55'.str_repeat('5', 39)), 64, '0', \STR_PAD_LEFT),
           ];
 
           $reader = new EthSafeReceiptReader($this->clientReturning($this->receiptPayload('0x1', [$log])), 'https://rpc.example/', self::PROXY_FACTORY);
@@ -1599,11 +1608,13 @@ Mirrors `EthReceiptReader` exactly: one `eth_getTransactionReceipt` call, manual
 
       public function testExecutionReceiptMatchesExecutionSuccess(): void
       {
+          // ExecutionSuccess(bytes32 indexed txHash, uint256 payment) — txHash is indexed
+          // (topics[1], the full bytes32 word, no slicing needed), payment is not (data).
           $safeTxHash = $this->txHash('b2');
           $log = [
               'address' => self::SAFE_ADDRESS,
-              'topics' => [self::EXECUTION_SUCCESS_TOPIC0],
-              'data' => substr($safeTxHash->value, 2).str_pad('0', 64, '0', \STR_PAD_LEFT),
+              'topics' => [self::EXECUTION_SUCCESS_TOPIC0, $safeTxHash->value],
+              'data' => '0x'.str_pad('0', 64, '0', \STR_PAD_LEFT),
           ];
 
           $reader = new EthSafeReceiptReader($this->clientReturning($this->receiptPayload('0x1', [$log])), 'https://rpc.example/', self::PROXY_FACTORY);
@@ -1618,8 +1629,8 @@ Mirrors `EthReceiptReader` exactly: one `eth_getTransactionReceipt` call, manual
           $safeTxHash = $this->txHash('b2');
           $log = [
               'address' => self::SAFE_ADDRESS,
-              'topics' => [self::EXECUTION_FAILURE_TOPIC0],
-              'data' => substr($safeTxHash->value, 2).str_pad('0', 64, '0', \STR_PAD_LEFT),
+              'topics' => [self::EXECUTION_FAILURE_TOPIC0, $safeTxHash->value],
+              'data' => '0x'.str_pad('0', 64, '0', \STR_PAD_LEFT),
           ];
 
           $reader = new EthSafeReceiptReader($this->clientReturning($this->receiptPayload('0x1', [$log])), 'https://rpc.example/', self::PROXY_FACTORY);
@@ -1633,8 +1644,8 @@ Mirrors `EthReceiptReader` exactly: one `eth_getTransactionReceipt` call, manual
       {
           $log = [
               'address' => self::SAFE_ADDRESS,
-              'topics' => [self::EXECUTION_SUCCESS_TOPIC0],
-              'data' => substr($this->txHash('c3')->value, 2).str_pad('0', 64, '0', \STR_PAD_LEFT),
+              'topics' => [self::EXECUTION_SUCCESS_TOPIC0, $this->txHash('c3')->value],
+              'data' => '0x'.str_pad('0', 64, '0', \STR_PAD_LEFT),
           ];
 
           $reader = new EthSafeReceiptReader($this->clientReturning($this->receiptPayload('0x1', [$log])), 'https://rpc.example/', self::PROXY_FACTORY);
@@ -1742,18 +1753,14 @@ Mirrors `EthReceiptReader` exactly: one `eth_getTransactionReceipt` call, manual
                   continue;
               }
 
-              $data = $log['data'] ?? null;
-              if (!\is_string($data)) {
+              // `proxy` is indexed (topics[1]) — ProxyCreation(address indexed proxy, address singleton).
+              $topics = $log['topics'] ?? null;
+              $proxyTopic = \is_array($topics) ? ($topics[1] ?? null) : null;
+              if (!\is_string($proxyTopic)) {
                   continue;
               }
 
-              $words = str_split(substr($data, 2), 64);
-              $proxyWord = $words[0] ?? null;
-              if (null === $proxyWord) {
-                  continue;
-              }
-
-              return new SafeDeploymentReceipt(true, '0x'.substr($proxyWord, 24));
+              return new SafeDeploymentReceipt(true, '0x'.substr($proxyTopic, 26));
           }
 
           return new SafeDeploymentReceipt(false, null);
@@ -1770,16 +1777,13 @@ Mirrors `EthReceiptReader` exactly: one `eth_getTransactionReceipt` call, manual
 
           $successTopic0 = '0x'.Keccak::hash(self::EXECUTION_SUCCESS_SIGNATURE, 256);
           $failureTopic0 = '0x'.Keccak::hash(self::EXECUTION_FAILURE_SIGNATURE, 256);
-          $expected = strtolower(substr($safeTxHash->value, 2));
+          $expected = strtolower($safeTxHash->value);
 
           foreach ($logs as $log) {
-              $data = $log['data'] ?? null;
-              if (!\is_string($data)) {
-                  continue;
-              }
-
-              $words = str_split(substr($data, 2), 64);
-              $loggedTxHash = strtolower($words[0] ?? '');
+              // `txHash` is indexed (topics[1]) — ExecutionSuccess/Failure(bytes32 indexed
+              // txHash, uint256 payment). It's already a full bytes32, no slicing needed.
+              $topics = $log['topics'] ?? null;
+              $loggedTxHash = \is_array($topics) && \is_string($topics[1] ?? null) ? strtolower($topics[1]) : null;
 
               if ($loggedTxHash !== $expected) {
                   continue;
