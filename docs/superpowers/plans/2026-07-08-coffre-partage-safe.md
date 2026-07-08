@@ -3292,7 +3292,7 @@ This is the practical proof that Task 1's pinned addresses and Task 9's event de
   {
       // Anvil's default account #0 — well-known, funded automatically by anvil --fork-url,
       // never used outside this integration test.
-      private const ADMIN_PRIVATE_KEY = '0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80';
+      private const ADMIN_PRIVATE_KEY = '0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80'; // gitleaks:allow
       private const ADMIN_WALLET = '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266';
 
       public function testDeploysConfirmsAndConnectsTheGroupSafeToTheYieldPool(): void
