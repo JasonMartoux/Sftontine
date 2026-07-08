@@ -76,3 +76,11 @@ services:
             $vaultAddress: '%env(VAULT_ADDRESS)%'
 
     App\Application\Tontine\Port\TontineGroupRepositoryInterface: '@App\Infrastructure\Persistence\DoctrineTontineGroupRepository'
+
+    App\Application\Safe\Port\SafeTransactionRepositoryInterface: '@App\Infrastructure\Persistence\DoctrineSafeTransactionRepository'
+    App\Application\Safe\Port\SafeReceiptReaderInterface: '@App\Infrastructure\Gateways\EthSafeReceiptReader'
+
+    App\Infrastructure\Gateways\EthSafeReceiptReader:
+        arguments:
+            $baseRpcUrl: '%env(BASE_RPC_URL)%'
+            $proxyFactoryAddress: '%env(SAFE_PROXY_FACTORY_ADDRESS)%'
