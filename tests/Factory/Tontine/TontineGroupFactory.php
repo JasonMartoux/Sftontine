@@ -57,7 +57,7 @@ final class TontineGroupFactory extends PersistentObjectFactory
         // OneToMany — see TontineGroup's class docblock), so the default single-entity
         // persist Foundry does isn't enough: re-run the real save() to persist them too.
         return $this->instantiateWith(Instantiator::namedConstructor('create'))
-            ->afterInstantiate(function (TontineGroup $group): void {
+            ->afterInstantiate(static function (TontineGroup $group): void {
                 // Provision a default Safe address so tests that exercise the contribution form work
                 $group->provisionSafe(new WalletAddress('0x4444444444444444444444444444444444444444'));
             })

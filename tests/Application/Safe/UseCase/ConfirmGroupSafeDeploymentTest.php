@@ -13,7 +13,6 @@ use App\Application\Tontine\Port\TontineGroupRepositoryInterface;
 use App\Domain\Deposit\TransactionHash;
 use App\Domain\Identity\User;
 use App\Domain\Identity\WalletAddress;
-use App\Domain\Safe\SafeTransaction;
 use App\Domain\Safe\SafeTransactionStatus;
 use App\Domain\Tontine\Periodicity;
 use App\Domain\Tontine\TontineGroup;

@@ -16,8 +16,6 @@ use App\Domain\Identity\User;
 use App\Domain\Identity\WalletAddress;
 use App\Domain\Tontine\Periodicity;
 use App\Domain\Tontine\TontineGroup;
-use App\Domain\Vault\VaultPosition;
-use BcMath\Number;
 use Money\Currency;
 use Money\Money;
 use PHPUnit\Framework\TestCase;
@@ -110,9 +108,10 @@ final class SyncVaultPositionsTest extends TestCase
         $blockchainReader->method('call')->willReturnCallback(
             static function (string $to, string $signature, array $args = []): array {
                 // Simulate failure for SAFE_ADDRESS
-                if (!empty($args) && $args[0] === self::SAFE_ADDRESS) {
+                if (!empty($args) && self::SAFE_ADDRESS === $args[0]) {
                     throw BlockchainCallException::rpcError('timeout');
                 }
+
                 return match ($signature) {
                     'balanceOf(address)' => ['0'],
                     'previewRedeem(uint256)' => ['0'],
