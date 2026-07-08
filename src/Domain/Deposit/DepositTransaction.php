@@ -48,14 +48,16 @@ final class DepositTransaction
 
     /**
      * The only path from `pending` to `confirmed`: the receipt must report success and an
-     * emitted `Deposit` event whose `owner` matches this transaction's wallet. Anything
-     * else (reverted tx, missing event, event for a different owner) is treated as failed.
+     * emitted `Deposit` event whose `sender` (the actual signer) matches this transaction's wallet
+     * — not `owner`/`receiver`, which for a group deposit is the group's Safe, never the depositing
+     * member's own wallet. Anything else (reverted tx, missing event, event for a different sender)
+     * is treated as failed.
      */
     public function applyReceipt(TransactionReceipt $receipt): void
     {
         if ($receipt->success
             && null !== $receipt->depositEvent
-            && $this->walletAddress->equals(new WalletAddress($receipt->depositEvent->owner))
+            && $this->walletAddress->equals(new WalletAddress($receipt->depositEvent->sender))
         ) {
             $this->amountMinorUnits = (string) $receipt->depositEvent->assets;
             $this->status = DepositTransactionStatus::Confirmed;

@@ -26,7 +26,7 @@ final class DepositTransactionTest extends TestCase
         self::assertNull($tx->amount());
     }
 
-    public function testSuccessfulReceiptWithMatchingOwnerConfirmsAndRecordsAmount(): void
+    public function testSuccessfulReceiptWithMatchingSenderConfirmsAndRecordsAmount(): void
     {
         $tx = $this->makePending();
 
@@ -67,7 +67,7 @@ final class DepositTransactionTest extends TestCase
         self::assertSame(DepositTransactionStatus::Failed, $tx->status);
     }
 
-    public function testSuccessfulReceiptForADifferentOwnerIsMarkedFailed(): void
+    public function testSuccessfulReceiptWithMatchingSenderButDifferentOwnerConfirms(): void
     {
         $tx = $this->makePending();
 
@@ -76,6 +76,23 @@ final class DepositTransactionTest extends TestCase
             depositEvent: new DepositEvent(
                 sender: self::WALLET,
                 owner: '0x3333333333333333333333333333333333333333',
+                assets: new Number('1000000'),
+                shares: new Number('1000000'),
+            ),
+        ));
+
+        self::assertSame(DepositTransactionStatus::Confirmed, $tx->status);
+    }
+
+    public function testSuccessfulReceiptForADifferentSenderIsMarkedFailed(): void
+    {
+        $tx = $this->makePending();
+
+        $tx->applyReceipt(new TransactionReceipt(
+            success: true,
+            depositEvent: new DepositEvent(
+                sender: '0x3333333333333333333333333333333333333333',
+                owner: self::WALLET,
                 assets: new Number('1000000'),
                 shares: new Number('1000000'),
             ),
