@@ -59,6 +59,8 @@ final readonly class GroupPotReader
             $members[] = $this->memberView($membership, $cycle, $group->periodicity, $group->installmentsPerCycle, $now, $shares);
         }
 
+        $safeSnapshot = null !== $group->safeAddress ? $this->snapshots->findLatestFor($group->safeAddress) : null;
+
         return new GroupPotView(
             groupId: $groupId,
             name: $group->name,
@@ -71,6 +73,13 @@ final readonly class GroupPotReader
             cycleNumber: $cycle?->number,
             cycleEndsAt: $cycle?->endsAt,
             members: $members,
+            safeAddress: $group->safeAddress?->value,
+            onChainPrincipalDisplay: $safeSnapshot?->principalDisplay(),
+            onChainYieldReceivedDisplay: $safeSnapshot?->yieldReceivedDisplay(),
+            onChainFlowRatePerSecondDisplay: $safeSnapshot?->flowRatePerSecondDisplay(),
+            onChainConnected: $safeSnapshot?->connected,
+            onChainPaused: $safeSnapshot?->paused,
+            onChainCapturedAtTimestamp: $safeSnapshot?->capturedAt->getTimestamp(),
         );
     }
 
