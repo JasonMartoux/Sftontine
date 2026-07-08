@@ -74,3 +74,5 @@ services:
         arguments:
             $baseRpcUrl: '%env(BASE_RPC_URL)%'
             $vaultAddress: '%env(VAULT_ADDRESS)%'
+
+    App\Application\Tontine\Port\TontineGroupRepositoryInterface: '@App\Infrastructure\Persistence\DoctrineTontineGroupRepository'

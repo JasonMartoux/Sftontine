@@ -1,0 +1,75 @@
+<div {{ attributes }} data-poll="delay(30000)|$render" style="border: 1px solid #ddd; border-radius: 8px; padding: 1.5rem;">
+    {% set pot = this.getPot() %}
+    {% if pot is null %}
+        <p style="color: #b91c1c;">Accès refusé.</p>
+    {% else %}
+        {% set isPunctual = pot.periodicity == 'punctual' %}
+
+        <p style="margin: 0 0 .5rem; text-transform: uppercase; font-size: .75rem; color: #666;">Pot commun · {{ pot.name }}</p>
+        <p style="margin: 0 0 .5rem; color: #666;">Périodicité : {{ this.getPeriodicityLabel() }}</p>
+        <p style="margin: 0;">Total cotisé</p>
+        <p style="margin: 0 0 1rem; font-size: 1.75rem; font-weight: bold;">${{ pot.potTotalDisplay }}</p>
+
+        <p style="margin: 0;">Yield estimé (temps réel)</p>
+        <p style="margin: 0 0 .25rem; font-size: 1.5rem; font-weight: bold;">
+            $<span data-controller="flowing-balance"
+                data-flowing-balance-balance-value="{{ pot.estimatedYieldDisplay }}"
+                data-flowing-balance-timestamp-value="{{ pot.computedAtTimestamp }}"
+                data-flowing-balance-flow-rate-per-second-value="{{ pot.flowRatePerSecondDisplay }}"
+                data-flowing-balance-decimals-value="6">{{ pot.estimatedYieldDisplay }}</span>
+        </p>
+        <p style="margin: 0 0 1rem; color: #666; font-size: .75rem;">Estimation off-chain basée sur l'APR courant ({{ (pot.aprBasisPoints / 100)|number_format(2) }} %) — le yield réel streame vers le wallet de chaque membre.</p>
+
+        {% if pot.cycleNumber is not null %}
+            <p style="margin: 0 0 1rem; color: #666;">
+                Cycle n°{{ pot.cycleNumber }}
+                {%- if pot.cycleEndsAt is not null %} — fin le {{ pot.cycleEndsAt|date('d/m/Y') }}{% endif -%}
+            </p>
+        {% endif %}
+
+        {% if isPunctual %}
+            <p style="margin: 0 0 1rem; color: #666; font-size: .875rem;">Cotisations libres — pas d'échéancier pour cette tontine.</p>
+        {% endif %}
+
+        <table style="width: 100%; border-collapse: collapse; margin-top: 1rem;">
+            <thead>
+                <tr style="text-align: left; border-bottom: 1px solid #ddd;">
+                    <th style="padding: .5rem 0;">Membre</th>
+                    <th style="padding: .5rem 0;">Cotisé</th>
+                    <th style="padding: .5rem 0;">Part du yield</th>
+                    {% if not isPunctual %}
+                        <th style="padding: .5rem 0;">Échéances</th>
+                        <th style="padding: .5rem 0;">Statut</th>
+                    {% endif %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for member in pot.members %}
+                    <tr style="border-bottom: 1px solid #eee;">
+                        <td style="padding: .5rem 0;">
+                            {{ member.email ?? (member.walletAddress|slice(0, 6) ~ '…' ~ member.walletAddress|slice(-4)) }}
+                            {% if member.role == 'admin' %}<span style="color: #666; font-size: .75rem;"> (admin)</span>{% endif %}
+                        </td>
+                        <td style="padding: .5rem 0;">${{ member.contributedDisplay }}</td>
+                        <td style="padding: .5rem 0;">${{ member.yieldShareDisplay }}</td>
+                        {% if not isPunctual %}
+                            <td style="padding: .5rem 0;">
+                                {{ member.paidInstallments }}/{{ member.expectedInstallments }}
+                                {% if member.nextDueDate is not null %}
+                                    <span style="color: #666; font-size: .75rem;"> · prochaine échéance le {{ member.nextDueDate|date('d/m/Y') }}</span>
+                                {% endif %}
+                            </td>
+                            <td style="padding: .5rem 0;">
+                                {% if member.isLate %}
+                                    <span style="color: #b91c1c;">En retard</span>
+                                {% else %}
+                                    <span style="color: #15803d;">À jour</span>
+                                {% endif %}
+                            </td>
+                        {% endif %}
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+</div>

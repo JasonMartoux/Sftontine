@@ -1,0 +1,28 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mes tontines — Sftontine{% endblock %}
+
+{% block body %}
+    <main style="max-width: 40rem; margin: 4rem auto; font-family: system-ui, sans-serif;">
+        <h1>Mes tontines</h1>
+
+        <p><a href="{{ path('app_tontine_new') }}">+ Créer une tontine</a></p>
+
+        {% if groups is empty %}
+            <p style="color: #666;">Vous ne faites partie d'aucune tontine pour le moment.</p>
+        {% else %}
+            <ul style="list-style: none; padding: 0;">
+                {% for group in groups %}
+                    <li style="border: 1px solid #ddd; border-radius: 8px; padding: 1rem; margin-bottom: .75rem;">
+                        <a href="{{ path('app_tontine_show', {id: group.id}) }}" style="font-weight: bold; text-decoration: none;">{{ group.name }}</a>
+                        <p style="margin: .25rem 0 0; color: #666;">
+                            ${{ group.amountDisplay }} · {{ group.periodicityLabel }} · {{ group.memberCount }} membre{{ group.memberCount > 1 ? 's' : '' }}
+                        </p>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+
+        <p><a href="{{ path('app_profile') }}">← Retour au profil</a></p>
+    </main>
+{% endblock %}

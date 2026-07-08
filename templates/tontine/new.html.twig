@@ -1,0 +1,47 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Créer une tontine — Sftontine{% endblock %}
+
+{% block body %}
+    <main style="max-width: 30rem; margin: 4rem auto; font-family: system-ui, sans-serif;">
+        <h1>Créer une tontine</h1>
+
+        {% if error is defined %}
+            <p style="color: #b91c1c;">{{ error }}</p>
+        {% endif %}
+
+        <form method="post" action="{{ path('app_tontine_create') }}">
+            <input type="hidden" name="_token" value="{{ csrf_token('create_tontine') }}">
+
+            <p>
+                <label for="name">Nom du groupe</label><br>
+                <input type="text" id="name" name="name" value="{{ name|default('') }}" required minlength="3" maxlength="100" style="width: 100%; padding: .5rem;">
+            </p>
+
+            <p>
+                <label for="amount">Montant de la cotisation (USDC)</label><br>
+                <input type="text" id="amount" name="amount" value="{{ amount|default('') }}" required inputmode="decimal" style="width: 100%; padding: .5rem;">
+            </p>
+
+            <p>
+                <label for="periodicity">Périodicité</label><br>
+                <select id="periodicity" name="periodicity" required style="width: 100%; padding: .5rem;" onchange="document.getElementById('installments-field').style.display = (this.value === 'punctual') ? 'none' : 'block'">
+                    <option value="weekly" {{ periodicity|default('') == 'weekly' ? 'selected' : '' }}>Hebdomadaire</option>
+                    <option value="biweekly" {{ periodicity|default('') == 'biweekly' ? 'selected' : '' }}>Bimensuelle</option>
+                    <option value="monthly" {{ periodicity|default('') == 'monthly' ? 'selected' : '' }}>Mensuelle</option>
+                    <option value="semiannual" {{ periodicity|default('') == 'semiannual' ? 'selected' : '' }}>Semestrielle</option>
+                    <option value="punctual" {{ periodicity|default('') == 'punctual' ? 'selected' : '' }}>Ponctuelle</option>
+                </select>
+            </p>
+
+            <p id="installments-field" style="{{ periodicity|default('') == 'punctual' ? 'display: none;' : '' }}">
+                <label for="installments">Nombre d'échéances du cycle</label><br>
+                <input type="number" id="installments" name="installments" value="{{ installments|default('12') }}" min="2" max="52" style="width: 100%; padding: .5rem;">
+            </p>
+
+            <button type="submit">Créer</button>
+        </form>
+
+        <p><a href="{{ path('app_tontine_index') }}">← Retour à mes tontines</a></p>
+    </main>
+{% endblock %}

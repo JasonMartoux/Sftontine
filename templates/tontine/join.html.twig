@@ -1,0 +1,31 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Rejoindre {{ group.name }} — Sftontine{% endblock %}
+
+{% block body %}
+    <main style="max-width: 30rem; margin: 4rem auto; font-family: system-ui, sans-serif; text-align: center;">
+        <h1>Rejoindre « {{ group.name }} »</h1>
+        <p style="color: #666;">Cotisation : ${{ group.contributionAmountDisplay }} · {{ group.memberCount }} membre{{ group.memberCount > 1 ? 's' : '' }}</p>
+
+        {% for message in app.flashes('tontine_error') %}
+            <p style="color: #b91c1c;">{{ message }}</p>
+        {% endfor %}
+
+        {% if not authenticated %}
+            <p>Connectez-vous pour rejoindre cette tontine.</p>
+            <div {{ react_component('PrivyLogin', {
+                appId: privy_app_id,
+                clientId: privy_app_client_id,
+                returnTo: returnTo,
+            }) }}></div>
+        {% elseif alreadyMember %}
+            <p>Vous êtes déjà membre de cette tontine.</p>
+            <p><a href="{{ path('app_tontine_show', {id: group.id}) }}">Voir la tontine →</a></p>
+        {% else %}
+            <form method="post" action="{{ currentUrl }}">
+                <input type="hidden" name="_token" value="{{ csrf_token('join_tontine_' ~ group.id) }}">
+                <button type="submit">Rejoindre cette tontine</button>
+            </form>
+        {% endif %}
+    </main>
+{% endblock %}
