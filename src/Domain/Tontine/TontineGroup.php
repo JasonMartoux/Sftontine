@@ -6,6 +6,7 @@ namespace App\Domain\Tontine;
 
 use App\Domain\Deposit\TransactionHash;
 use App\Domain\Identity\User;
+use App\Domain\Identity\WalletAddress;
 use App\Domain\Tontine\Event\ContributionRecorded;
 use App\Domain\Tontine\Event\CycleClosed;
 use App\Domain\Tontine\Event\MemberJoined;
@@ -44,6 +45,9 @@ final class TontineGroup
     #[ORM\GeneratedValue(strategy: 'IDENTITY')]
     #[ORM\Column(type: 'integer')]
     public private(set) ?int $id = null;
+
+    #[ORM\Column(name: 'safe_address', type: 'wallet_address', length: 42, nullable: true)]
+    public private(set) ?WalletAddress $safeAddress = null;
 
     /** @var list<Membership> */
     private array $memberships = [];
@@ -204,6 +208,35 @@ final class TontineGroup
         }
 
         return null;
+    }
+
+    public function provisionSafe(WalletAddress $safeAddress): void
+    {
+        if (null !== $this->safeAddress && !$this->safeAddress->equals($safeAddress)) {
+            throw new \LogicException('This group already has a different Safe provisioned.');
+        }
+
+        $this->safeAddress = $safeAddress;
+    }
+
+    public function hasSafe(): bool
+    {
+        return null !== $this->safeAddress;
+    }
+
+    /**
+     * @return list<string>
+     */
+    public function adminWalletAddresses(): array
+    {
+        $addresses = [];
+        foreach ($this->memberships as $membership) {
+            if (MembershipRole::Admin === $membership->role) {
+                $addresses[] = $membership->user->walletAddress->value;
+            }
+        }
+
+        return $addresses;
     }
 
     public function potTotal(): Money
