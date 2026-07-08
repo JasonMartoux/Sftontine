@@ -93,7 +93,7 @@ final class TontineJourneyTest extends WebTestCase
         $group = $groups->find($groupId);
         self::assertNotNull($group);
 
-        $group->provisionSafe(new WalletAddress('0x'.str_repeat('0', 40)));
+        $group->provisionSafe(new WalletAddress('0x4444444444444444444444444444444444444444'));
         $groups->save($group);
     }
 
