@@ -25,7 +25,8 @@ final class Version20260707192431 extends AbstractMigration
 
     public function down(Schema $schema): void
     {
-        // this down() migration is auto-generated, please modify it to your needs
+        // Rolling back requires no existing row to have a NULL ends_at (i.e. no Punctual
+        // savings cycles created since this migration ran) — SET NOT NULL will fail otherwise.
         $this->addSql('ALTER TABLE tontine_savings_cycle ALTER ends_at SET NOT NULL');
     }
 }

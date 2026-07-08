@@ -6,7 +6,14 @@
     <main style="max-width: 40rem; margin: 4rem auto; font-family: system-ui, sans-serif;">
         <p><a href="{{ path('app_tontine_index') }}">← Mes tontines</a></p>
         <h1>{{ group.name }}</h1>
-        <p style="color: #666;">Cotisation : ${{ group.contributionAmountDisplay }} · {{ group.installmentsPerCycle }} échéances</p>
+        <p style="color: #666;">
+            Cotisation : ${{ group.contributionAmountDisplay }} ·
+            {%- if group.periodicity.value == 'punctual' %}
+                Cotisations libres
+            {%- else %}
+                {{ group.installmentsPerCycle }} échéance{{ group.installmentsPerCycle > 1 ? 's' : '' }}
+            {%- endif %}
+        </p>
 
         {% for message in app.flashes('tontine_success') %}
             <p style="color: #15803d;">{{ message }}</p>

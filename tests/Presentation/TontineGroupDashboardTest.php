@@ -68,6 +68,7 @@ final class TontineGroupDashboardTest extends WebTestCase
         self::assertSelectorTextContains('body', 'Ponctuelle');
         self::assertSelectorTextContains('body', 'Cotisations libres');
         self::assertSelectorTextNotContains('body', 'Échéances');
+        self::assertSelectorTextNotContains('body', 'échéance');
         self::assertSelectorTextNotContains('body', 'En retard');
         self::assertSelectorTextNotContains('body', 'À jour');
     }
