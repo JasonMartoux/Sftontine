@@ -112,6 +112,7 @@
         "phpstan/phpstan-doctrine": "^2.0",
         "phpstan/phpstan-symfony": "^2.0",
         "phpunit/phpunit": "^13.2",
+        "simplito/elliptic-php": "^1.0",
         "symfony/ai-mate": "^0.10.0",
         "symfony/ai-monolog-mate-extension": "^0.10.0",
         "symfony/ai-symfony-mate-extension": "^0.10.0",
