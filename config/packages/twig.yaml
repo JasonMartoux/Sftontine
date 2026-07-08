@@ -7,6 +7,9 @@ twig:
         vault_address: '%env(VAULT_ADDRESS)%'
         usdc_address: '%env(USDC_ADDRESS)%'
         gda_forwarder_address: '%env(GDA_FORWARDER_ADDRESS)%'
+        safe_proxy_factory_address: '%env(SAFE_PROXY_FACTORY_ADDRESS)%'
+        safe_singleton_address: '%env(SAFE_SINGLETON_ADDRESS)%'
+        safe_fallback_handler_address: '%env(SAFE_FALLBACK_HANDLER_ADDRESS)%'
 
 when@test:
     twig:

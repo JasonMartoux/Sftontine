@@ -119,6 +119,7 @@ final class TontineGroupController extends AbstractController
             'group' => $group,
             'invitationUrl' => $invitationUrl,
             'latestDeposit' => $this->deposits->findLatestFor($user->walletAddress),
+            'isAdmin' => MembershipRole::Admin === $membership->role,
         ]);
     }
 
