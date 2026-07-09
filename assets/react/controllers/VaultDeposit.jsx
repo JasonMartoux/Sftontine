@@ -179,7 +179,7 @@ function DepositForm(props) {
                 address: props.gdaForwarderAddress,
                 abi: gdaForwarderAbi,
                 functionName: 'isMemberConnected',
-                args: [yieldPoolAddress, wallet.address],
+                args: [yieldPoolAddress, receiver],
             });
 
             if (!alreadyConnected && !props.receiverAddress) {

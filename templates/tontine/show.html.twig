@@ -43,7 +43,7 @@
                 vaultAddress: vault_address,
                 usdcAddress: usdc_address,
                 gdaForwarderAddress: gda_forwarder_address,
-                receiverAddress: group.safeAddress,
+                receiverAddress: group.safeAddress.value,
             }) }}></div>
 
             <form method="post" action="{{ path('app_tontine_contribute', {id: group.id}) }}">
@@ -63,7 +63,7 @@
                 appId: privy_app_id,
                 clientId: privy_app_client_id,
                 groupId: group.id,
-                safeAddress: group.safeAddress,
+                safeAddress: group.safeAddress ? group.safeAddress.value : null,
                 ownerAddresses: group.adminWalletAddresses,
                 proxyFactoryAddress: safe_proxy_factory_address,
                 safeSingletonAddress: safe_singleton_address,

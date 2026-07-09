@@ -49,18 +49,24 @@ function GroupSafeAdminPanel(props) {
         let cancelled = false;
 
         (async () => {
-            const client = await getClient();
-            const fundManagerAddress = await client.readContract({ address: props.vaultAddress, abi: vaultAbi, functionName: 'FUND_MANAGER' });
-            const yieldPoolAddress = await client.readContract({ address: fundManagerAddress, abi: fundManagerAbi, functionName: 'YIELD_POOL' });
-            const isConnected = await client.readContract({
-                address: props.gdaForwarderAddress,
-                abi: gdaForwarderAbi,
-                functionName: 'isMemberConnected',
-                args: [yieldPoolAddress, props.safeAddress],
-            });
+            try {
+                const client = await getClient();
+                const fundManagerAddress = await client.readContract({ address: props.vaultAddress, abi: vaultAbi, functionName: 'FUND_MANAGER' });
+                const yieldPoolAddress = await client.readContract({ address: fundManagerAddress, abi: fundManagerAbi, functionName: 'YIELD_POOL' });
+                const isConnected = await client.readContract({
+                    address: props.gdaForwarderAddress,
+                    abi: gdaForwarderAbi,
+                    functionName: 'isMemberConnected',
+                    args: [yieldPoolAddress, props.safeAddress],
+                });
 
-            if (!cancelled) {
-                setConnected(isConnected);
+                if (!cancelled) {
+                    setConnected(isConnected);
+                }
+            } catch (err) {
+                if (!cancelled) {
+                    setError(err?.shortMessage ?? err?.message ?? "Impossible de vérifier l'état de connexion du pool de rendement.");
+                }
             }
         })();
 
