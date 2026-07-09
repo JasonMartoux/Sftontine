@@ -21,6 +21,13 @@ final readonly class GroupPotView
         public ?int $cycleNumber,
         public ?\DateTimeImmutable $cycleEndsAt,
         public array $members,
+        public ?string $safeAddress = null,
+        public ?string $onChainPrincipalDisplay = null,
+        public ?string $onChainYieldReceivedDisplay = null,
+        public ?string $onChainFlowRatePerSecondDisplay = null,
+        public ?bool $onChainConnected = null,
+        public ?bool $onChainPaused = null,
+        public ?int $onChainCapturedAtTimestamp = null,
     ) {
     }
 }

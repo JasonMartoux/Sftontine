@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Domain\Vault;
 
 use App\Domain\Identity\WalletAddress;
+use BcMath\Number;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -57,5 +58,26 @@ final class YieldSnapshot
             aprBasisPoints: (int) (string) $position->aprBasisPoints,
             capturedAt: new \DateTimeImmutable(),
         );
+    }
+
+    public function principalDisplay(): string
+    {
+        \assert(is_numeric($this->principalMinorUnits));
+
+        return (string) (new Number($this->principalMinorUnits))->div('1000000', 6);
+    }
+
+    public function yieldReceivedDisplay(): string
+    {
+        \assert(is_numeric($this->yieldReceived));
+
+        return (string) (new Number($this->yieldReceived))->div('1000000000000000000', 6);
+    }
+
+    public function flowRatePerSecondDisplay(): string
+    {
+        \assert(is_numeric($this->flowRate));
+
+        return (string) (new Number($this->flowRate))->div('1000000000000000000', 6);
     }
 }

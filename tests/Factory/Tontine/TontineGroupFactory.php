@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Factory\Tontine;
 
 use App\Application\Tontine\Port\TontineGroupRepositoryInterface;
+use App\Domain\Identity\WalletAddress;
 use App\Domain\Tontine\Periodicity;
 use App\Domain\Tontine\TontineGroup;
 use App\Tests\Factory\Identity\UserFactory;
@@ -56,6 +57,10 @@ final class TontineGroupFactory extends PersistentObjectFactory
         // OneToMany — see TontineGroup's class docblock), so the default single-entity
         // persist Foundry does isn't enough: re-run the real save() to persist them too.
         return $this->instantiateWith(Instantiator::namedConstructor('create'))
+            ->afterInstantiate(static function (TontineGroup $group): void {
+                // Provision a default Safe address so tests that exercise the contribution form work
+                $group->provisionSafe(new WalletAddress('0x4444444444444444444444444444444444444444'));
+            })
             ->afterPersist(function (TontineGroup $group): void {
                 $this->groups->save($group);
             });

@@ -24,6 +24,7 @@ final class GroupPotReaderTest extends TestCase
 {
     private const ALICE_WALLET = '0x1111111111111111111111111111111111111111';
     private const BOB_WALLET = '0x2222222222222222222222222222222222222222';
+    private const SAFE_ADDRESS = '0x4444444444444444444444444444444444444444';
     private const CREATED_AT = '2026-01-01T00:00:00+00:00';
     private const NOW = '2026-01-08T00:00:00+00:00';
 
@@ -123,6 +124,55 @@ final class GroupPotReaderTest extends TestCase
         self::assertCount(1, $view->members);
         self::assertSame(0, $view->members[0]->expectedInstallments);
         self::assertFalse($view->members[0]->isLate);
+    }
+
+    public function testIncludesOnChainSafePositionWhenGroupHasASafeAndASnapshot(): void
+    {
+        $alice = self::alice();
+        $group = TontineGroup::create($alice, 'Tontine famille', self::usdc('25000000'), Periodicity::Weekly, 2, new \DateTimeImmutable(self::CREATED_AT));
+        $group->provisionSafe(new WalletAddress(self::SAFE_ADDRESS));
+
+        $groups = $this->createStub(TontineGroupRepositoryInterface::class);
+        $groups->method('find')->willReturn($group);
+
+        $safeSnapshot = YieldSnapshot::fromPosition(new WalletAddress(self::SAFE_ADDRESS), new VaultPosition(
+            shares: new Number('0'),
+            principal: self::usdc('25000000'),
+            yieldReceived: new Number('1000000000000000000'),
+            flowRate: new Number('100'),
+            connected: true,
+            paused: false,
+            aprBasisPoints: new Number('500'),
+        ));
+
+        $snapshots = $this->createStub(YieldSnapshotRepositoryInterface::class);
+        $snapshots->method('findMostRecent')->willReturn($safeSnapshot);
+        $snapshots->method('findLatestFor')->willReturn($safeSnapshot);
+
+        $reader = new GroupPotReader($groups, $snapshots, $this->clock());
+        $view = $reader->read(1);
+
+        self::assertNotNull($view);
+        self::assertSame(self::SAFE_ADDRESS, $view->safeAddress);
+        self::assertSame('25.000000', $view->onChainPrincipalDisplay);
+        self::assertTrue($view->onChainConnected);
+        self::assertFalse($view->onChainPaused);
+    }
+
+    public function testOmitsOnChainPositionWhenGroupHasNoSafeYet(): void
+    {
+        $alice = self::alice();
+        $group = TontineGroup::create($alice, 'Tontine famille', self::usdc('25000000'), Periodicity::Weekly, 2, new \DateTimeImmutable(self::CREATED_AT));
+
+        $groups = $this->createStub(TontineGroupRepositoryInterface::class);
+        $groups->method('find')->willReturn($group);
+
+        $reader = new GroupPotReader($groups, $this->snapshots(500), $this->clock());
+        $view = $reader->read(1);
+
+        self::assertNotNull($view);
+        self::assertNull($view->safeAddress);
+        self::assertNull($view->onChainPrincipalDisplay);
     }
 
     private static function alice(): User

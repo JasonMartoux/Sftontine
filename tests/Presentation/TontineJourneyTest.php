@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Presentation;
 
+use App\Application\Tontine\Port\TontineGroupRepositoryInterface;
 use App\Domain\Deposit\DepositEvent;
 use App\Domain\Deposit\DepositTransaction;
 use App\Domain\Deposit\TransactionHash;
@@ -46,6 +47,9 @@ final class TontineJourneyTest extends WebTestCase
         self::assertMatchesRegularExpression('#^/tontines/\d+$#', $showUrl);
         $groupId = (int) substr($showUrl, \strlen('/tontines/'));
 
+        // Provision a Safe for the group so the contribution form can be rendered.
+        $this->provisionSafe($groupId);
+
         // A generates the invitation link from the group page.
         $crawler = $client->request('GET', $showUrl);
         self::assertResponseIsSuccessful();
@@ -79,6 +83,18 @@ final class TontineJourneyTest extends WebTestCase
         self::assertResponseIsSuccessful();
         self::assertSelectorTextContains('body', '$25.000000');
         self::assertSelectorTextContains('body', 'Cotisation enregistrée');
+    }
+
+    private function provisionSafe(int $groupId): void
+    {
+        $groups = self::getContainer()->get(TontineGroupRepositoryInterface::class);
+        \assert($groups instanceof TontineGroupRepositoryInterface);
+
+        $group = $groups->find($groupId);
+        self::assertNotNull($group);
+
+        $group->provisionSafe(new WalletAddress('0x4444444444444444444444444444444444444444'));
+        $groups->save($group);
     }
 
     /**

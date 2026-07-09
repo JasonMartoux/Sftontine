@@ -16,4 +16,9 @@ interface TontineGroupRepositoryInterface
      * @return list<TontineGroup>
      */
     public function findAllForUserId(int $userId): array;
+
+    /**
+     * @return list<TontineGroup>
+     */
+    public function findAllWithSafeAddress(): array;
 }

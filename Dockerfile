@@ -26,6 +26,7 @@ RUN <<-EOF
 		@composer \
 		apcu \
 		bcmath \
+		gmp \
 		intl \
 		opcache \
 		zip

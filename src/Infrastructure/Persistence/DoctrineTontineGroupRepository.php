@@ -74,4 +74,25 @@ final readonly class DoctrineTontineGroupRepository implements TontineGroupRepos
 
         return $groups;
     }
+
+    public function findAllWithSafeAddress(): array
+    {
+        $ids = $this->entityManager->createQueryBuilder()
+            ->select('g.id')
+            ->from(TontineGroup::class, 'g')
+            ->where('g.safeAddress IS NOT NULL')
+            ->getQuery()
+            ->getSingleColumnResult();
+
+        $groups = [];
+        foreach ($ids as $id) {
+            \assert(is_numeric($id));
+            $group = $this->find((int) $id);
+            if (null !== $group) {
+                $groups[] = $group;
+            }
+        }
+
+        return $groups;
+    }
 }

@@ -290,6 +290,54 @@ final class TontineGroupTest extends TestCase
         self::assertTrue(self::makeGroup(self::alice())->potTotal()->isZero());
     }
 
+    public function testHasNoSafeByDefault(): void
+    {
+        $group = self::makeGroup(self::alice());
+
+        self::assertFalse($group->hasSafe());
+        self::assertNull($group->safeAddress);
+    }
+
+    public function testProvisionSafeSetsAddress(): void
+    {
+        $group = self::makeGroup(self::alice());
+        $safeAddress = new WalletAddress('0x4444444444444444444444444444444444444444');
+
+        $group->provisionSafe($safeAddress);
+
+        self::assertTrue($group->hasSafe());
+        self::assertNotNull($group->safeAddress);
+        self::assertTrue($group->safeAddress->equals($safeAddress));
+    }
+
+    public function testProvisionSafeIsIdempotentForTheSameAddress(): void
+    {
+        $group = self::makeGroup(self::alice());
+        $safeAddress = new WalletAddress('0x4444444444444444444444444444444444444444');
+
+        $group->provisionSafe($safeAddress);
+        $group->provisionSafe($safeAddress);
+
+        self::assertTrue($group->hasSafe());
+    }
+
+    public function testProvisionSafeRejectsChangingToADifferentAddress(): void
+    {
+        $group = self::makeGroup(self::alice());
+        $group->provisionSafe(new WalletAddress('0x4444444444444444444444444444444444444444'));
+
+        $this->expectException(\LogicException::class);
+        $group->provisionSafe(new WalletAddress('0x5555555555555555555555555555555555555555'));
+    }
+
+    public function testAdminWalletAddressesReturnsOnlyTheCreator(): void
+    {
+        $group = self::makeGroup(self::alice());
+        $group->join(self::bob(), new \DateTimeImmutable(self::NOW));
+
+        self::assertSame(['0x1111111111111111111111111111111111111111'], $group->adminWalletAddresses());
+    }
+
     private static function makeGroup(User $creator): TontineGroup
     {
         return TontineGroup::create(

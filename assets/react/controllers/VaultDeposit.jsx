@@ -46,6 +46,7 @@ function DepositForm(props) {
     const [error, setError] = React.useState(null);
 
     const wallet = wallets.find((w) => w.walletClientType === 'privy');
+    const receiver = props.receiverAddress ?? wallet?.address;
     const busy = status === 'approving' || status === 'depositing' || status === 'connecting';
 
     const getClient = React.useCallback(async () => {
@@ -82,7 +83,7 @@ function DepositForm(props) {
                     address: props.vaultAddress,
                     abi: vaultAbi,
                     functionName: 'maxDeposit',
-                    args: [wallet.address],
+                    args: [receiver],
                 }),
                 client.readContract({
                     address: props.vaultAddress,
@@ -162,14 +163,14 @@ function DepositForm(props) {
                 address: props.vaultAddress,
                 abi: vaultAbi,
                 functionName: 'deposit',
-                args: [assets, wallet.address],
+                args: [assets, receiver],
                 account: wallet.address,
             });
             const depositHash = await client.writeContract({
                 address: props.vaultAddress,
                 abi: vaultAbi,
                 functionName: 'deposit',
-                args: [assets, wallet.address],
+                args: [assets, receiver],
                 gas: depositGas * TX_GAS_BUFFER,
             });
             await client.waitForTransactionReceipt({ hash: depositHash });
@@ -178,10 +179,10 @@ function DepositForm(props) {
                 address: props.gdaForwarderAddress,
                 abi: gdaForwarderAbi,
                 functionName: 'isMemberConnected',
-                args: [yieldPoolAddress, wallet.address],
+                args: [yieldPoolAddress, receiver],
             });
 
-            if (!alreadyConnected) {
+            if (!alreadyConnected && !props.receiverAddress) {
                 setStatus('connecting');
                 const connectGas = await client.estimateContractGas({
                     address: props.gdaForwarderAddress,

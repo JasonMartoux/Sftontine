@@ -33,24 +33,44 @@
             {{ component('TontineGroupDashboard', {groupId: group.id}) }}
         </div>
 
-        <h2>Enregistrer une cotisation</h2>
-        <p style="color: #666;">Déposez d'abord sur le SuperVault, puis enregistrez le hash de la transaction ici pour qu'elle compte dans le pot du groupe.</p>
+        {% if group.safeAddress is not null %}
+            <h2>Enregistrer une cotisation</h2>
+            <p style="color: #666;">Déposez d'abord sur le SuperVault, puis enregistrez le hash de la transaction ici pour qu'elle compte dans le pot du groupe.</p>
 
-        <div {{ react_component('VaultDeposit', {
-            appId: privy_app_id,
-            clientId: privy_app_client_id,
-            vaultAddress: vault_address,
-            usdcAddress: usdc_address,
-            gdaForwarderAddress: gda_forwarder_address,
-        }) }}></div>
+            <div {{ react_component('VaultDeposit', {
+                appId: privy_app_id,
+                clientId: privy_app_client_id,
+                vaultAddress: vault_address,
+                usdcAddress: usdc_address,
+                gdaForwarderAddress: gda_forwarder_address,
+                receiverAddress: group.safeAddress.value,
+            }) }}></div>
 
-        <form method="post" action="{{ path('app_tontine_contribute', {id: group.id}) }}">
-            <input type="hidden" name="_token" value="{{ csrf_token('contribute_tontine_' ~ group.id) }}">
-            <p>
-                <label for="txHash">Hash de la transaction de dépôt</label><br>
-                <input type="text" id="txHash" name="txHash" value="{{ latestDeposit ? latestDeposit.txHash : '' }}" required pattern="0x[0-9a-fA-F]{64}" style="width: 100%; padding: .5rem;">
-            </p>
-            <button type="submit">Enregistrer ma cotisation</button>
-        </form>
+            <form method="post" action="{{ path('app_tontine_contribute', {id: group.id}) }}">
+                <input type="hidden" name="_token" value="{{ csrf_token('contribute_tontine_' ~ group.id) }}">
+                <p>
+                    <label for="txHash">Hash de la transaction de dépôt</label><br>
+                    <input type="text" id="txHash" name="txHash" value="{{ latestDeposit ? latestDeposit.txHash : '' }}" required pattern="0x[0-9a-fA-F]{64}" style="width: 100%; padding: .5rem;">
+                </p>
+                <button type="submit">Enregistrer ma cotisation</button>
+            </form>
+        {% else %}
+            <p>En attente de la configuration du coffre du groupe par l'administrateur.</p>
+        {% endif %}
+
+        {% if isAdmin %}
+            <div {{ react_component('GroupSafeAdmin', {
+                appId: privy_app_id,
+                clientId: privy_app_client_id,
+                groupId: group.id,
+                safeAddress: group.safeAddress ? group.safeAddress.value : null,
+                ownerAddresses: group.adminWalletAddresses,
+                proxyFactoryAddress: safe_proxy_factory_address,
+                safeSingletonAddress: safe_singleton_address,
+                safeFallbackHandlerAddress: safe_fallback_handler_address,
+                gdaForwarderAddress: gda_forwarder_address,
+                vaultAddress: vault_address,
+            }) }}></div>
+        {% endif %}
     </main>
 {% endblock %}

@@ -160,6 +160,48 @@ final class TontineGroupControllerTest extends WebTestCase
         self::assertSelectorExists('input[readonly]');
     }
 
+    /**
+     * Regression test: `group.safeAddress` is a `WalletAddress` value object, not a string.
+     * `json_encode()` never calls `__toString()` on nested objects, so passing it directly to
+     * `react_component()`'s props (rather than `.value`) would silently serialize as
+     * `{"value":"0x..."}` instead of a plain address string — breaking every viem call in
+     * `VaultDeposit.jsx`/`GroupSafeAdmin.jsx` that expects a string address. Inspect the actual
+     * rendered `data-*-props-value` JSON rather than trusting a passing render alone.
+     */
+    public function testShowRendersSafeAddressAsAPlainStringInReactComponentProps(): void
+    {
+        $client = self::createClient();
+        $this->login($client, 'did:privy:tontine-show-safe-props', '0x8888888888888888888888888888888888888888');
+        $creator = $this->findUser('did:privy:tontine-show-safe-props');
+        $group = TontineGroupFactory::createOne(['creator' => $creator]);
+        self::assertNotNull($group->safeAddress, 'Fixture precondition: the factory provisions a Safe by default.');
+
+        $crawler = $client->request('GET', '/tontines/'.$group->id);
+        self::assertResponseIsSuccessful();
+
+        $reactDivs = $crawler->filter('[data-controller="symfony--ux-react--react"]');
+        self::assertGreaterThan(0, $reactDivs->count());
+
+        $checked = 0;
+        $reactDivs->each(static function ($node) use (&$checked, $group): void {
+            $componentName = $node->attr('data-symfony--ux-react--react-component-value');
+            if (!\in_array($componentName, ['VaultDeposit', 'GroupSafeAdmin'], true)) {
+                return;
+            }
+
+            $propsJson = $node->attr('data-symfony--ux-react--react-props-value');
+            self::assertNotNull($propsJson);
+            $props = json_decode($propsJson, associative: true, flags: \JSON_THROW_ON_ERROR);
+            \assert(\is_array($props));
+
+            $key = 'VaultDeposit' === $componentName ? 'receiverAddress' : 'safeAddress';
+            self::assertSame($group->safeAddress->value, $props[$key]);
+            ++$checked;
+        });
+
+        self::assertSame(2, $checked, 'Expected to check both VaultDeposit and GroupSafeAdmin props.');
+    }
+
     public function testContributeWithConfirmedDepositRecordsContribution(): void
     {
         $wallet = '0x8888888888888888888888888888888888888888';
