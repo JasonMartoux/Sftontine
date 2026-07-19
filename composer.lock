@@ -5340,16 +5340,16 @@
         },
         {
             "name": "symfony/stimulus-bundle",
-            "version": "v3.2.0",
+            "version": "v3.3.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/stimulus-bundle.git",
-                "reference": "3cf8cd35c400f287def6ccd4574c111c07661054"
+                "reference": "1a885a51d6bad71e869779da148dfef4fc8e5705"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/stimulus-bundle/zipball/3cf8cd35c400f287def6ccd4574c111c07661054",
-                "reference": "3cf8cd35c400f287def6ccd4574c111c07661054",
+                "url": "https://api.github.com/repos/symfony/stimulus-bundle/zipball/1a885a51d6bad71e869779da148dfef4fc8e5705",
+                "reference": "1a885a51d6bad71e869779da148dfef4fc8e5705",
                 "shasum": ""
             },
             "require": {
@@ -5392,7 +5392,7 @@
                 "symfony-ux"
             ],
             "support": {
-                "source": "https://github.com/symfony/stimulus-bundle/tree/v3.2.0"
+                "source": "https://github.com/symfony/stimulus-bundle/tree/v3.3.0"
             },
             "funding": [
                 {
@@ -5412,7 +5412,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2026-06-05T09:42:50+00:00"
+            "time": "2026-07-13T16:10:12+00:00"
         },
         {
             "name": "symfony/stopwatch",
@@ -6029,16 +6029,16 @@
         },
         {
             "name": "symfony/ux-react",
-            "version": "v3.2.0",
+            "version": "v3.3.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/ux-react.git",
-                "reference": "178ed4536659b85b2d32c5285c8514aeb4eeb7d4"
+                "reference": "8727ed607671bfd77e8cd4091b2b6e4ffc9a8eff"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/ux-react/zipball/178ed4536659b85b2d32c5285c8514aeb4eeb7d4",
-                "reference": "178ed4536659b85b2d32c5285c8514aeb4eeb7d4",
+                "url": "https://api.github.com/repos/symfony/ux-react/zipball/8727ed607671bfd77e8cd4091b2b6e4ffc9a8eff",
+                "reference": "8727ed607671bfd77e8cd4091b2b6e4ffc9a8eff",
                 "shasum": ""
             },
             "require": {
@@ -6085,7 +6085,7 @@
                 "symfony-ux"
             ],
             "support": {
-                "source": "https://github.com/symfony/ux-react/tree/v3.2.0"
+                "source": "https://github.com/symfony/ux-react/tree/v3.3.0"
             },
             "funding": [
                 {
@@ -6105,7 +6105,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2026-06-05T09:42:50+00:00"
+            "time": "2026-07-09T05:17:17+00:00"
         },
         {
             "name": "symfony/ux-turbo",
